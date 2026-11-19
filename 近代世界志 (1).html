@@ -1,0 +1,2361 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>图见world · 1804–1949</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%232a241b'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23a87f35'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23ece2cf'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --paper:#ece2cf;
+    --paper-2:#e4d8bd;
+    --card:#f3ecdb;
+    --ink:#2a241b;
+    --ink-soft:#635743;
+    --line:#c9b98f;
+    --ocean:#bccdc8;
+    --land:#d8c69c;
+    --land-stroke:#8f7d57;
+    --accent:#9c3327;
+    --gold:#a87f35;
+    --shadow:0 10px 30px rgba(42,36,27,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none !important}
+  h1,h2,h3,p,div,span,button,input,select,li{overflow-wrap:break-word;word-break:break-word;min-width:0}
+  html,body{height:100%}
+  body{
+    font-family:"Noto Sans SC",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* ===== 顶部 ===== */
+  header{
+    padding:18px 26px 14px;
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    background:linear-gradient(180deg,var(--paper-2),var(--paper));
+  }
+  .title-block h1{
+    font-family:"Noto Serif SC",serif;font-weight:900;font-size:28px;letter-spacing:.06em;
+  }
+  .title-block h1 .year{color:var(--accent)}
+  .title-block p{margin-top:6px;color:var(--ink-soft);font-size:13px;letter-spacing:.02em}
+  .era-count{
+    font-family:"Noto Serif SC",serif;font-size:14px;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--card);
+  }
+  .era-count strong{color:var(--accent);font-size:18px;font-variant-numeric:tabular-nums}
+
+  /* ===== 主体布局 ===== */
+  main{
+    flex:1;display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:16px;
+    padding:16px 26px;min-height:0;
+  }
+  #mapPanel{display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0}
+
+  /* 控制栏 */
+  .control-bar{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .control-meta{margin-left:auto;font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .atlas-select{
+    padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);
+    font:inherit;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;min-width:0;max-width:100%;
+  }
+  .atlas-select:hover{border-color:var(--gold)}
+
+  /* 下拉菜单 */
+  .dd{position:relative}
+  .dd-btn{
+    display:flex;align-items:center;gap:10px;padding:10px 14px;
+    border:1px solid var(--line);border-radius:10px;background:var(--paper);
+    font-size:14px;font-weight:600;min-width:0;max-width:100%;
+  }
+  .dd-btn:hover{border-color:var(--gold)}
+  .dd-btn .dd-year{font-family:"Noto Serif SC",serif;font-size:16px;color:var(--accent);font-variant-numeric:tabular-nums}
+  .dd-btn .dd-caret{margin-left:auto;color:var(--ink-soft);display:flex}
+  .dd-pop{
+    position:absolute;top:calc(100% + 8px);left:0;width:330px;z-index:30;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+    max-height:330px;overflow-y:auto;padding:8px;
+    opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .15s,transform .15s;
+  }
+  .dd-pop.show{opacity:1;pointer-events:auto;transform:translateY(0)}
+  .dd-group-title{font-size:11px;color:var(--ink-soft);letter-spacing:.08em;padding:10px 12px 4px}
+  .dd-opt{
+    display:flex;justify-content:space-between;align-items:center;width:100%;
+    padding:9px 12px;border-radius:9px;font-size:13.5px;text-align:left;gap:10px;
+  }
+  .dd-opt:hover{background:var(--paper-2)}
+  .dd-opt.active{background:var(--ink);color:var(--paper)}
+  .dd-count{font-size:11px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .dd-opt.active .dd-count{color:var(--gold)}
+
+  /* 地图 */
+  #mapWrap{
+    position:relative;flex:1;min-height:420px;border:1px solid var(--land-stroke);
+    border-radius:14px;overflow:hidden;background:var(--ocean);box-shadow:var(--shadow);
+    touch-action:none;
+  }
+  #map{display:block;width:100%;height:100%;cursor:grab}
+  #map.dragging{cursor:grabbing}
+  .land{fill:var(--land);stroke:var(--land-stroke);stroke-width:.6;stroke-linejoin:round}
+  .realm{stroke-width:1;stroke-dasharray:4 3;stroke-linejoin:round;pointer-events:none}
+  .realm.expand{fill:rgba(77,122,82,.16);stroke:#4d7a52}
+  .realm.shrink{fill:rgba(156,51,39,.15);stroke:#9c3327}
+  .realm.hold{fill:rgba(168,127,53,.14);stroke:#a87f35}
+  .graticule{fill:none;stroke:rgba(90,80,55,.25);stroke-width:.5}
+  .sphere{fill:none;stroke:var(--land-stroke);stroke-width:1}
+
+  .marker{cursor:pointer}
+  .marker .halo{fill:var(--accent);opacity:.16}
+  .marker .dot{stroke:var(--paper);stroke-width:1}
+  .marker.active .halo{opacity:.35}
+  .marker.active .dot{stroke:var(--ink);stroke-width:1.3}
+  .marker-label{
+    font-family:"Noto Sans SC",sans-serif;font-size:11px;fill:var(--ink);
+    paint-order:stroke;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round;
+  }
+
+  /* 地图控件 */
+  #zoomControls{
+    position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:6px;
+  }
+  #zoomControls button{
+    width:34px;height:34px;border-radius:8px;background:var(--card);border:1px solid var(--line);
+    font-size:17px;line-height:1;color:var(--ink);box-shadow:0 2px 8px rgba(42,36,27,.15);
+  }
+  #zoomControls button:hover{background:var(--paper-2)}
+  #legend{
+    position:absolute;left:14px;bottom:14px;background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:12px;
+  }
+  #legend .legend-title{font-weight:700;font-size:11px;color:var(--ink-soft);letter-spacing:.08em;margin-bottom:2px}
+  #legend .legend-row{display:flex;align-items:center;gap:8px}
+  #legend .swatch{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .legend-toggle{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;color:var(--ink);margin-bottom:4px;user-select:none}
+  .legend-toggle input{position:absolute;opacity:0;pointer-events:none}
+  .lt-switch{width:30px;height:17px;border-radius:999px;background:var(--line);position:relative;transition:background .15s;flex:none}
+  .lt-switch::after{content:'';position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:var(--paper);transition:transform .15s}
+  .legend-toggle input:checked + .lt-switch{background:var(--accent)}
+  .legend-toggle input:checked + .lt-switch::after{transform:translateX(13px)}
+  .legend-toggle input:focus-visible ~ span{outline:2px solid var(--accent);outline-offset:2px}
+  .place-label{font-size:10px;fill:var(--ink-soft)}
+  #tooltip{
+    position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);
+    padding:7px 10px;border-radius:8px;font-size:12px;line-height:1.5;max-width:220px;
+    opacity:0;transition:opacity .12s;z-index:5;
+  }
+  #tooltip.show{opacity:1}
+  #tooltip .tt-year{color:var(--gold);font-weight:700;margin-right:6px}
+  #mapNote{
+    position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+    background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--ink-soft);
+  }
+
+  /* 侧栏 */
+  #sidePanel{
+    display:flex;flex-direction:column;gap:13px;min-height:0;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;padding:16px;
+  }
+  .search-box{
+    display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:11px;
+    background:var(--paper);padding:0 12px;
+  }
+  .search-box svg{flex:none;color:var(--ink-soft)}
+  .search-box input{
+    flex:1;border:0;background:none;padding:11px 0;font:inherit;font-size:13.5px;color:var(--ink);
+    outline:none;min-width:0;
+  }
+  .search-box input::placeholder{color:var(--ink-soft)}
+  .search-clear{flex:none;color:var(--ink-soft);font-size:15px;padding:4px 2px;visibility:hidden}
+  .search-clear.show{visibility:visible}
+
+  #eraDesc{border-left:3px solid var(--gold);padding-left:12px}
+  #eraDesc h2{font-family:"Noto Serif SC",serif;font-size:16px;font-weight:700}
+  #eraDesc p{margin-top:4px;font-size:12.5px;color:var(--ink-soft);line-height:1.7}
+
+  .list-head{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;font-weight:700}
+  .list-head span:last-child{font-weight:400;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  #eventList{overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:4px;min-height:0}
+  .event-item{
+    text-align:left;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--paper);
+    transition:border-color .15s,background .15s;
+  }
+  .event-item:hover{border-color:var(--gold)}
+  .event-item.active{border-color:var(--accent);background:var(--paper-2)}
+  .event-item .ei-top{display:flex;align-items:center;gap:8px;min-width:0}
+  .event-item .ei-year{flex:none;font-family:"Noto Serif SC",serif;font-weight:700;font-size:13px;color:var(--accent);font-variant-numeric:tabular-nums}
+  .event-item .ei-cat{flex:none;font-size:11px;color:var(--ink-soft)}
+  .event-item .ei-title{font-size:13.5px;font-weight:500;margin-top:3px;line-height:1.5}
+  .event-item .ei-place{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
+  .list-hint{font-size:12px;color:var(--ink-soft);line-height:1.7;padding:4px 2px}
+
+  /* ===== 弹窗 ===== */
+  #modalOverlay{
+    position:fixed;inset:0;background:rgba(42,36,27,.55);z-index:50;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    opacity:0;pointer-events:none;transition:opacity .18s;
+  }
+  #modalOverlay.show{opacity:1;pointer-events:auto}
+  #modalCard{
+    width:min(520px,100%);max-height:86vh;overflow-y:auto;background:var(--card);
+    border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+    transform:translateY(10px);transition:transform .18s;
+  }
+  #modalOverlay.show #modalCard{transform:translateY(0)}
+  .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:20px 22px 0}
+  .modal-head .m-year{font-family:"Noto Serif SC",serif;font-size:14px;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+  .modal-close{
+    width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--paper);
+    font-size:16px;line-height:1;flex:none;
+  }
+  .modal-close:hover{background:var(--paper-2)}
+  .modal-body{padding:12px 22px 22px}
+  .modal-body h3{font-family:"Noto Serif SC",serif;font-size:22px;margin:4px 0 6px;line-height:1.35}
+  .modal-place{font-size:12.5px;color:var(--ink-soft);margin-bottom:12px}
+  .modal-place .m-cat{display:inline-block;font-size:11px;padding:2px 9px;border-radius:999px;color:var(--paper);margin-left:6px}
+  .m-media{margin:10px 0 14px;display:flex;flex-direction:column;gap:9px}
+  .m-photo{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:var(--paper-2)}
+  .m-photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .m-play{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;
+    background:rgba(42,36,27,.62);color:var(--paper);border:1px solid rgba(236,226,207,.5);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .m-play:hover{background:var(--accent)}
+  .m-video{border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#17130d}
+  .m-video iframe{width:100%;height:100%;border:0;display:block}
+  .m-cap{font-size:11.5px;color:var(--ink-soft);line-height:1.6}
+  .media-ph{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--ink-soft);font-size:12px;text-align:center;line-height:1.7;padding:16px;background:var(--paper-2);border-radius:12px}
+  .media-attr{position:absolute;left:0;right:0;bottom:0;font-size:10.5px;color:var(--paper);background:linear-gradient(180deg,transparent,rgba(42,36,27,.75));padding:16px 10px 6px;text-decoration:none}
+  .modal-desc{font-size:14px;line-height:1.9;color:var(--ink)}
+  .m-kp{margin-top:14px}
+  .m-exam{margin-top:14px}
+  .exam-block{border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:13px 15px;display:flex;flex-direction:column;gap:10px}
+  .exam-row{display:flex;gap:12px;align-items:flex-start;min-width:0}
+  .exam-tag{flex:none;width:64px;font-family:"Noto Serif SC",serif;font-size:12px;font-weight:700;color:var(--gold);padding-top:1px}
+  .exam-val{flex:1;min-width:0;font-size:13px;line-height:1.8;color:var(--ink)}
+  .kp-title{font-family:"Noto Serif SC",serif;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:.06em;margin-bottom:7px}
+  .kp-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+  .kp-list li{position:relative;padding-left:16px;font-size:13px;line-height:1.8;color:var(--ink)}
+  .kp-list li::before{content:'';position:absolute;left:2px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .modal-refs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .modal-refs a{
+    font-size:12.5px;text-decoration:none;border:1px solid var(--line);border-radius:999px;
+    padding:7px 13px;background:var(--paper);color:var(--ink);display:inline-flex;align-items:center;gap:6px;
+  }
+  .modal-refs a:hover{border-color:var(--gold);background:var(--paper-2)}
+  .modal-refs a .ref-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+  footer{
+    padding:10px 26px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-soft);
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+
+  /* 窄屏 */
+  @media (max-width: 960px){
+    main{grid-template-columns:1fr;grid-template-rows:auto auto;overflow:visible}
+    #mapWrap{min-height:58vh}
+    #sidePanel{max-height:none}
+    #eventList{max-height:340px}
+    .dd-pop{width:min(330px,80vw)}
+  }
+
+  /* ===== 开场动画 ===== */
+  #intro{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(160deg,#2a241b 0%,#3d3325 55%,#241f17 100%);transition:opacity .6s ease}
+  #intro.out{opacity:0;pointer-events:none}
+  .intro-skip{position:absolute;top:22px;right:26px;color:#c9b98f;border:1px solid rgba(201,185,143,.4);
+    border-radius:999px;padding:8px 16px;font-size:13px;letter-spacing:.08em;background:transparent;cursor:pointer}
+  .intro-skip:hover{color:#ece2cf;border-color:var(--gold)}
+  .intro-inner{text-align:center;max-width:780px;padding:0 24px}
+  .intro-eyebrow{font-size:12px;letter-spacing:.32em;color:var(--gold);margin-bottom:18px;opacity:0;animation:introFade .8s .2s forwards}
+  .intro-title{font-family:"Noto Serif SC",serif;font-weight:900;font-size:clamp(40px,7vw,64px);
+    color:#ece2cf;letter-spacing:.12em;opacity:0;transform:translateY(18px);animation:introUp 1s .5s forwards}
+  .intro-sub{margin-top:16px;color:#c9b98f;font-size:15px;line-height:1.8;opacity:0;animation:introFade .9s 1.1s forwards}
+  .intro-timeline{margin-top:40px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .intro-chip{border:1px solid rgba(201,185,143,.35);border-radius:999px;padding:7px 14px;font-size:12.5px;
+    color:#c9b98f;opacity:0;transform:scale(.92);transition:opacity .4s,transform .4s,color .3s,border-color .3s,background .3s}
+  .intro-chip.on{opacity:1;transform:scale(1);color:#ece2cf;border-color:var(--gold);background:rgba(168,127,53,.18)}
+  .intro-progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(201,185,143,.15)}
+  #introBar{display:block;height:100%;width:0;background:var(--gold);animation:introBar 15s linear forwards}
+  @keyframes introFade{to{opacity:1}}
+  @keyframes introUp{to{opacity:1;transform:translateY(0)}}
+  @keyframes introBar{from{width:0}to{width:100%}}
+  @media (prefers-reduced-motion: reduce){
+    #intro{display:none}
+  }
+
+  /* ===== 模式切换 ===== */
+  .mode-switch{display:flex;border:1px solid var(--line);border-radius:999px;background:var(--paper-2);padding:3px;gap:3px}
+  .mode-btn{padding:8px 18px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink-soft)}
+  .mode-btn.active{background:var(--card);color:var(--accent);box-shadow:0 2px 8px rgba(42,36,27,.12)}
+
+  /* ===== 答题面板 ===== */
+  #quizPanel{flex:1;padding:16px 26px;min-height:0}
+  .quiz-wrap{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;height:100%}
+  .quiz-main{min-width:0}
+  .quiz-card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:28px;min-height:420px}
+  .quiz-eyebrow{font-size:11px;letter-spacing:.28em;color:var(--gold);margin-bottom:10px}
+  .quiz-card h2{font-family:"Noto Serif SC",serif;font-size:26px;margin-bottom:12px}
+  .quiz-intro{color:var(--ink-soft);line-height:1.9;font-size:14px;max-width:560px}
+  .quiz-opts{margin:20px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .quiz-opts label{font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:10px}
+  .quiz-opts select{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font:inherit}
+  .quiz-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+  .btn-primary{background:var(--accent);color:var(--paper);padding:11px 22px;border-radius:12px;font-weight:600}
+  .btn-primary:hover{filter:brightness(1.08)}
+  .btn-ghost{border:1px solid var(--line);border-radius:12px;padding:11px 18px;color:var(--ink-soft)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--ink)}
+  .btn-sm{padding:6px 12px;font-size:12.5px}
+
+  .quiz-top{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+  .quiz-progress{font-variant-numeric:tabular-nums;color:var(--ink-soft);font-size:13px}
+  .quiz-score{margin-left:auto;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  .quiz-stem{font-family:"Noto Serif SC",serif;font-size:21px;line-height:1.7;margin-bottom:22px}
+  .quiz-options{display:grid;gap:12px}
+  .quiz-option{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--paper);font-size:14.5px;line-height:1.7;transition:border-color .15s,background .15s}
+  .quiz-option > span:last-child{min-width:0}
+  .quiz-option .qo-key{flex:0 0 24px;height:24px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12.5px;color:var(--ink-soft)}
+  .quiz-option:not(.locked):hover{border-color:var(--gold)}
+  .quiz-option.correct{border-color:var(--gold);background:rgba(168,127,53,.12)}
+  .quiz-option.correct .qo-key{background:var(--gold);color:var(--paper);border-color:var(--gold)}
+  .quiz-option.wrong{border-color:var(--accent);background:rgba(156,51,39,.08)}
+  .quiz-option.wrong .qo-key{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+  .quiz-option.locked{cursor:default}
+  .quiz-explain{margin-top:20px;padding:16px;border-left:3px solid var(--gold);background:var(--paper-2);border-radius:0 12px 12px 0;line-height:1.8;font-size:13.5px;color:var(--ink)}
+  .quiz-explain .qe-title{font-weight:700;color:var(--gold);margin-bottom:6px}
+  .quiz-bottom{margin-top:22px;display:flex;justify-content:flex-end}
+
+  .result-stat{display:flex;gap:28px;margin:18px 0;flex-wrap:wrap}
+  .result-stat .rs-item{display:flex;flex-direction:column;gap:4px}
+  .result-stat .rs-num{font-family:"Noto Serif SC",serif;font-size:30px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
+  .result-stat .rs-label{font-size:12.5px;color:var(--ink-soft)}
+  .result-review{margin-top:18px;display:flex;flex-direction:column;gap:12px;max-height:300px;overflow:auto}
+  .review-item{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--paper)}
+  .review-item .ri-stem{font-weight:600;margin-bottom:6px;line-height:1.6}
+  .review-item .ri-line{font-size:13px;color:var(--ink-soft);line-height:1.7}
+  .review-item .ri-line.ok{color:#4d7a52}
+  .review-item .ri-line.bad{color:var(--accent)}
+  .review-item.bad-item{border-left:3px solid var(--accent);background:var(--paper-2)}
+
+  /* ===== 答疑助手 ===== */
+  #quizAssistant{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);min-height:420px;overflow:hidden}
+  .qa-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);font-weight:700;font-family:"Noto Serif SC",serif}
+  .qa-name em{font-style:normal;font-size:12px;color:var(--ink-soft);font-weight:400;margin-left:6px}
+  .qa-cfg{font-size:12px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+  .qa-actions{display:flex;gap:8px}
+  .qa-log{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+  .qa-msg{max-width:88%;padding:10px 13px;border-radius:12px;font-size:13.5px;line-height:1.7}
+  .qa-msg.user{align-self:flex-end;background:var(--accent);color:var(--paper);border-bottom-right-radius:4px}
+  .qa-msg.bot{align-self:flex-start;background:var(--paper-2);border-bottom-left-radius:4px}
+  .qa-msg.sys{align-self:center;font-size:12px;color:var(--ink-soft)}
+  .qa-input{display:flex;gap:8px;padding:14px 16px;border-top:1px solid var(--line)}
+  .qa-input input{flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font:inherit;min-width:0}
+  .qa-input button{background:var(--ink);color:var(--paper);border-radius:10px;padding:0 16px;font-size:13px}
+
+  /* ===== 主题课件 PPT ===== */
+  .theme-box{display:flex;gap:8px}
+  .theme-box input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font:inherit;font-size:13.5px;color:var(--ink);outline:none}
+  .theme-box input::placeholder{color:var(--ink-soft)}
+  .theme-box button{flex:none;background:var(--ink);color:var(--paper);border-radius:10px;padding:0 14px;font-size:13px}
+  .theme-hint{font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-top:-4px}
+
+  #themeOverlay{position:fixed;inset:0;z-index:80;background:rgba(42,36,27,.6);display:flex;align-items:center;justify-content:center;padding:20px}
+  #themeCard{width:min(860px,100%);height:min(600px,90vh);background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+  .theme-top{display:flex;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid var(--line)}
+  .theme-tag{font-size:11px;letter-spacing:.18em;color:var(--gold);font-weight:700}
+  .theme-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--paper);font-size:16px;line-height:1;flex:none}
+  .theme-close:hover{background:var(--paper-2)}
+  .theme-zoom{margin-left:auto;display:flex;align-items:center;gap:6px}
+  .theme-zoom button{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--paper);font-size:13px;color:var(--ink)}
+  .theme-zoom button:hover{background:var(--paper-2)}
+  .theme-zoom span{font-size:12px;color:var(--ink-soft);width:50px;text-align:center;font-variant-numeric:tabular-nums}
+  .tp-notes{margin-top:14px;border-left:3px solid var(--line);padding-left:12px;font-size:12.5px;color:var(--ink-soft);line-height:1.8}
+  .theme-stage{flex:1;overflow-y:auto;padding:30px 34px}
+  .tp-cover{margin:auto;max-width:620px;text-align:center;padding:8px 0}
+  .tp-cover .tp-eyebrow{font-size:12px;letter-spacing:.28em;color:var(--gold);margin-bottom:16px}
+  .tp-cover h2{font-family:"Noto Serif SC",serif;font-weight:900;font-size:clamp(26px,4vw,38px);line-height:1.4;color:var(--ink)}
+  .tp-cover .tp-sub{margin-top:12px;font-family:"Noto Serif SC",serif;font-size:17px;color:var(--accent)}
+  .tp-cover .tp-lead{margin:18px auto 0;max-width:520px;font-size:14px;line-height:1.9;color:var(--ink-soft)}
+  .tp-slide{max-width:680px;margin:0 auto;width:100%;animation:tpIn .25s ease}
+  @keyframes tpIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .tp-slide h3{font-family:"Noto Serif SC",serif;font-size:22px;margin-bottom:14px;line-height:1.4}
+  .tp-points{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+  .tp-points li{position:relative;padding-left:18px;line-height:1.8;font-size:14px}
+  .tp-points li::before{content:'';position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .tp-body{line-height:1.9;color:var(--ink);font-size:14px}
+  .tp-related{margin-top:20px;border-top:1px dashed var(--line);padding-top:14px}
+  .tp-related .tr-title{font-size:12px;color:var(--ink-soft);margin-bottom:8px}
+  .tp-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .tp-chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--paper);color:var(--ink-soft)}
+  .theme-bottom{display:flex;align-items:center;gap:12px;padding:14px 22px;border-top:1px solid var(--line)}
+  .theme-pager{font-size:13px;color:var(--ink-soft);font-variant-numeric:tabular-nums;flex:none}
+  .theme-progress{flex:1;height:5px;border-radius:999px;background:var(--paper-2);overflow:hidden}
+  .theme-progress span{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .25s}
+  .theme-nav{display:flex;gap:8px;flex:none}
+  .theme-nav button{border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:13px;background:var(--paper)}
+  .theme-nav button.primary{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+  .theme-nav button:disabled{opacity:.4;cursor:default}
+  .theme-fs{border:1px solid var(--line);border-radius:10px;padding:7px 13px;font-size:13px;background:var(--paper);color:var(--ink);flex:none}
+  .theme-fs:hover{background:var(--paper-2)}
+  /* 全屏放映（WPS 演示风格） */
+  #themeOverlay.fs{padding:0;background:#1c1712}
+  #themeOverlay.fs #themeCard{width:100%;height:100%;max-width:none;border-radius:0;border:none;box-shadow:none;background:var(--paper)}
+  #themeOverlay.fs .theme-stage{padding:40px 56px;font-size:16px}
+  #themeOverlay.fs .tp-slide{max-width:860px}
+  #themeOverlay.fs .tp-slide h3{font-size:27px}
+  #themeOverlay.fs .tp-points li{font-size:16px}
+  #themeOverlay.fs .tp-body{font-size:16px}
+  #themeOverlay.fs .tp-cover h2{font-size:clamp(32px,5vw,46px)}
+  #themeOverlay.fs .theme-top,#themeOverlay.fs .theme-bottom{padding-left:32px;padding-right:32px}
+
+  /* ===== AI 配置抽屉 ===== */
+  #aiSettings{position:fixed;inset:0;z-index:90;background:rgba(42,36,27,.4);display:flex;align-items:center;justify-content:center;padding:20px}
+  .ai-card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:26px;width:min(460px,92vw)}
+  .ai-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .ai-head h3{font-family:"Noto Serif SC",serif;font-size:19px}
+  .ai-sub{font-size:12.5px;color:var(--ink-soft);line-height:1.7;margin-bottom:16px}
+  .ai-field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink-soft);margin-bottom:14px}
+  .ai-field input, .ai-field select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font:inherit}
+  .ai-warn{font-size:12px;color:var(--accent);line-height:1.7;margin:6px 0 16px}
+  .ai-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+  @media (max-width: 960px){
+    .quiz-wrap{grid-template-columns:1fr}
+    #quizAssistant{min-height:280px}
+  }
+</style>
+</head>
+<body>
+
+<!-- 开场动画（15 秒，可跳过） -->
+<div id="intro" aria-hidden="true">
+  <button class="intro-skip" id="introSkip">跳过 <span>›</span></button>
+  <div class="intro-inner">
+    <div class="intro-eyebrow">INTERACTIVE HISTORY ATLAS</div>
+    <h1 class="intro-title">图见world</h1>
+    <div class="intro-sub">1804 — 1949 · 六十余起事件串联两百年变革、冲突与演进</div>
+    <div class="intro-timeline" id="introTimeline"></div>
+  </div>
+  <div class="intro-progress"><span id="introBar"></span></div>
+</div>
+
+<header>
+  <div class="title-block">
+    <h1>图见world <span class="year">1804–1949</span></h1>
+    <p>拖动平移、滚轮缩放；下拉选择年份，或在右侧按地区与年份检索事件</p>
+  </div>
+  <div class="mode-switch" role="tablist" aria-label="模式切换">
+    <button id="modeMap" class="mode-btn active" role="tab" aria-selected="true">地图浏览</button>
+    <button id="modeQuiz" class="mode-btn" role="tab" aria-selected="false">答题模式</button>
+  </div>
+  <div class="era-count">共收录 <strong id="yearCount">0</strong> 起事件</div>
+</header>
+
+<main>
+  <section id="mapPanel">
+    <div class="control-bar">
+      <div class="dd" id="dd">
+        <button class="dd-btn" id="ddBtn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="dd-year" id="ddLabel">1840 年</span>
+          <span class="dd-caret">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+          </span>
+        </button>
+        <div class="dd-pop" id="ddPop" role="listbox"></div>
+      </div>
+      <select id="atlasSelect" class="atlas-select" aria-label="选择地图册"></select>
+      <span class="control-meta" id="rangeMeta"></span>
+    </div>
+    <div id="mapWrap">
+      <svg id="map" role="img" aria-label="图见world 历史地图">
+        <g id="viewport">
+          <g id="graticule"></g>
+          <g id="land"></g>
+          <g id="realms"></g>
+          <g id="markers"></g>
+        </g>
+      </svg>
+      <div id="zoomControls">
+        <button id="zoomIn" aria-label="放大">＋</button>
+        <button id="zoomOut" aria-label="缩小">－</button>
+        <button id="zoomReset" aria-label="重置视角">⌂</button>
+      </div>
+      <div id="legend"></div>
+      <div id="tooltip" hidden></div>
+      <div id="mapNote" hidden>边界数据离线未加载，当前仅显示事件点位与经纬网格</div>
+    </div>
+  </section>
+
+  <aside id="sidePanel">
+    <div class="search-box">
+      <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+      <input type="search" id="searchInput" placeholder="搜索地区或事件，如：中国 1949" autocomplete="off">
+      <button class="search-clear" id="searchClear" aria-label="清空搜索">✕</button>
+    </div>
+    <div class="theme-box">
+      <input type="search" id="themeInput" placeholder="输入主题生成课件，如：长征" autocomplete="off">
+      <button id="themeGo" type="button">生成课件</button>
+    </div>
+    <p class="theme-hint">输入历史主题，自动识别并放映配套学习课件。</p>
+    <div id="eraDesc"></div>
+    <div class="list-head"><span>事件列表</span><span id="listCount"></span></div>
+    <div id="eventList"></div>
+  </aside>
+</main>
+
+<!-- 答题模式 -->
+<section id="quizPanel" hidden>
+  <div class="quiz-wrap">
+    <div class="quiz-main">
+      <div id="quizStart" class="quiz-card">
+        <div class="quiz-eyebrow">QUIZ MODE</div>
+        <h2>近代史知识答题</h2>
+        <p class="quiz-intro">从收录的 1804—1949 年事件中随机抽取题目，涵盖年份、地点、分类与知识点判断。作答后即时判分并给出解析，可随时向史鉴提问。</p>
+        <div class="quiz-opts">
+          <label>题目数量
+            <select id="quizCount">
+              <option value="10">10 题</option>
+              <option value="20" selected>20 题</option>
+              <option value="68">全部 68 题</option>
+            </select>
+          </label>
+          <label>地区范围
+            <select id="quizRegion">
+              <option value="all" selected>全部地区</option>
+              <option value="china">中国近代史</option>
+              <option value="world">世界史</option>
+            </select>
+          </label>
+          <label>事件分类
+            <select id="quizCat">
+              <option value="all" selected>全部分类</option>
+              <option value="war">战争冲突</option>
+              <option value="revolution">革命起义</option>
+              <option value="diplomacy">条约外交</option>
+              <option value="independence">独立运动</option>
+              <option value="tech">科技发明</option>
+              <option value="society">社会思潮</option>
+            </select>
+          </label>
+          <label>年代范围
+            <select id="quizEra">
+              <option value="all" selected>全部年代</option>
+            </select>
+          </label>
+        </div>
+        <div class="quiz-actions">
+          <button id="quizBegin" class="btn-primary">开始答题</button>
+          <button id="quizAiSettings" class="btn-ghost">AI 答疑设置</button>
+        </div>
+      </div>
+
+      <div id="quizPlay" class="quiz-card" hidden>
+        <div class="quiz-top">
+          <span id="quizProgress" class="quiz-progress"></span>
+          <span id="quizScore" class="quiz-score"></span>
+          <button id="quizQuit" class="btn-ghost btn-sm">退出答题</button>
+        </div>
+        <div id="quizStem" class="quiz-stem"></div>
+        <div id="quizOptions" class="quiz-options"></div>
+        <div id="quizExplain" class="quiz-explain" hidden></div>
+        <div class="quiz-bottom">
+          <button id="quizNext" class="btn-primary" hidden>下一题</button>
+        </div>
+      </div>
+
+      <div id="quizResult" class="quiz-card" hidden>
+        <div class="quiz-eyebrow">RESULT</div>
+        <h2 id="resultTitle">答题完成</h2>
+        <div id="resultStat" class="result-stat"></div>
+        <div id="resultReview" class="result-review"></div>
+        <div class="quiz-actions">
+          <button id="quizReviewDeck" class="btn-primary" hidden>生成错题总结课件</button>
+          <button id="quizRetry" class="btn-primary">再答一轮</button>
+          <button id="quizBackMap" class="btn-ghost">返回地图</button>
+        </div>
+      </div>
+    </div>
+
+    <aside id="quizAssistant">
+      <div class="qa-head">
+        <span class="qa-name">史鉴 <em>答疑助手</em></span>
+        <div class="qa-actions">
+          <button id="qaClear" class="qa-cfg" type="button">清空对话</button>
+          <button id="qaSettings" class="qa-cfg" type="button">设置</button>
+        </div>
+      </div>
+      <div id="qaLog" class="qa-log"></div>
+      <div class="qa-input">
+        <input id="qaInput" type="text" placeholder="可连续追问，如：这一事件有什么影响？和前一问有何关联？" autocomplete="off">
+        <button id="qaSend" aria-label="发送提问">发送</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- AI 配置抽屉 -->
+<div id="aiSettings" hidden>
+  <div class="ai-card" role="dialog" aria-modal="true" aria-label="AI 答疑配置">
+    <div class="ai-head">
+      <h3>AI 答疑配置</h3>
+      <button id="aiClose" class="btn-ghost btn-sm" aria-label="关闭">✕</button>
+    </div>
+    <p class="ai-sub">接入豆包（火山方舟）或其他 OpenAI 兼容的 Chat Completions 接口；未保存配置或调用失败时，自动回退到本机内置知识库答疑。</p>
+    <form id="aiForm" onsubmit="return false">
+    <label class="ai-field">服务商
+      <select id="aiProvider">
+        <option value="doubao">豆包 · 火山方舟</option>
+        <option value="openai">其他 OpenAI 兼容服务</option>
+      </select>
+    </label>
+    <label class="ai-field">接口地址
+      <input id="aiBase" type="text" placeholder="https://ark.cn-beijing.volces.com/api/v3/chat/completions" autocomplete="off">
+    </label>
+    <label class="ai-field">模型名称 / 接入点 ID
+      <input id="aiModel" type="text" placeholder="接入点 ID 或模型名，如 ep-2024xxxxxx / doubao-seed-..." autocomplete="off">
+    </label>
+    <label class="ai-field">API Key
+      <input id="aiKey" type="password" placeholder="方舟控制台获取的 API Key" autocomplete="off">
+    </label>
+    <p class="ai-sub" id="aiProviderHint"></p>
+    <p class="ai-warn">密钥仅保存在本机浏览器 localStorage；浏览器端直连存在泄露风险，请勿在公共设备填写。</p>
+    </form>
+    <div class="ai-actions">
+      <button id="aiSave" type="button" class="btn-primary">保存配置</button>
+      <button id="aiClear" type="button" class="btn-ghost">清除配置</button>
+    </div>
+  </div>
+</div>
+
+<!-- 事件详情弹窗 -->
+<div id="modalOverlay" role="dialog" aria-modal="true" aria-label="事件详情">
+  <div id="modalCard">
+    <div class="modal-head">
+      <div class="m-year" id="mYear"></div>
+      <button class="modal-close" id="modalClose" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="m-media" id="mMedia"></div>
+      <h3 id="mTitle"></h3>
+      <div class="modal-place" id="mPlace"></div>
+      <p class="modal-desc" id="mDesc"></p>
+      <div class="m-exam" id="mExam"></div>
+      <div class="m-kp" id="mKp"></div>
+      <div class="modal-refs" id="mRefs"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 主题课件 PPT -->
+<div id="themeOverlay" hidden role="dialog" aria-modal="true" aria-label="主题课件放映">
+  <div id="themeCard">
+    <div class="theme-top">
+      <span class="theme-tag" id="themeTag">主题课件</span>
+      <div class="theme-zoom">
+        <button id="themeZoomOut" type="button" aria-label="缩小课件">A−</button>
+        <span id="themeZoomVal">100%</span>
+        <button id="themeZoomIn" type="button" aria-label="放大课件">A+</button>
+      </div>
+      <button id="themeFs" type="button" class="theme-fs" aria-label="全屏放映">全屏放映</button>
+      <button class="theme-close" id="themeClose" aria-label="关闭课件">✕</button>
+    </div>
+    <div class="theme-stage" id="themeStage"></div>
+    <div class="theme-bottom">
+      <span class="theme-pager" id="themePager"></span>
+      <div class="theme-progress"><span id="themeBar"></span></div>
+      <div class="theme-nav">
+        <button id="themePrev" type="button">上一页</button>
+        <button id="themeNext" type="button" class="primary">下一页</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>事件为教材级近代史梳理，地名标注至国家 / 地域；地图边界来自 Natural Earth（world-atlas 110m）；疆域色块为教材示意，非精确历史边界；弹窗内视频与封面来自 B 站相关历史投稿，未收录素材的事件提供百科、图片与视频搜索入口。</span>
+  <span>范围：世界近代史 · 1804 — 1949</span>
+</footer>
+
+<script type="module">
+import { geoNaturalEarth1, geoPath, geoGraticule10 } from 'https://fastly.jsdelivr.net/npm/d3-geo@3/+esm';
+import { feature } from 'https://fastly.jsdelivr.net/npm/topojson-client@3/+esm';
+
+/* ================= 分类 ================= */
+const CATS = {
+  war:         { label:'战争冲突', color:'#9c3327' },
+  revolution:  { label:'革命起义', color:'#c96a2b' },
+  diplomacy:  { label:'条约外交', color:'#3d6e8f' },
+  independence:{ label:'独立运动', color:'#7a5a8c' },
+  tech:        { label:'科技发明', color:'#4d7a52' },
+  society:     { label:'社会思潮', color:'#8a7a4d' },
+};
+
+/* ================= 年代分期（用于分组与说明） ================= */
+const PERIODS = [
+  [1800,1815,'革命与拿破仑','拿破仑战争重塑欧洲版图，拉美独立运动起步。'],
+  [1816,1848,'复辟与独立浪潮','维也纳体系下欧洲复辟，拉美各国相继独立，工业革命与新思潮扩散。'],
+  [1849,1871,'民族统一与帝国扩张','意大利、德意志走向统一，列强在全球扩张，内战与起义此起彼伏。'],
+  [1872,1914,'帝国主义时代','列强瓜分非洲与亚洲，军备竞赛加剧，革命、改革与对外战争交织。'],
+  [1914,1918,'第一次世界大战','萨拉热窝事件点燃战火，俄国爆发革命，旧帝国相继瓦解。'],
+  [1919,1938,'两次大战之间','凡尔赛体系重建秩序，大萧条冲击全球，民族独立运动高涨。'],
+  [1939,1945,'第二次世界大战','战火席卷欧亚，太平洋战争爆发，人类文明经受重创。'],
+  [1946,1949,'战后新格局','殖民体系松动，印度、以色列建国，新中国成立，冷战格局形成。'],
+];
+
+/* ================= 事件数据
+   y:年份 t:标题 p:地点 c:分类 d:简述 lng/lat:经纬度 wiki:维基条目名(可选) */
+const EVENTS = [
+  { y:1804, t:'拿破仑加冕称帝', p:'法国 · 巴黎', c:'diplomacy', wiki:'拿破仑一世', lng:2.3522, lat:48.8566, d:'拿破仑·波拿巴在巴黎圣母院加冕为法兰西皇帝，法兰西第一帝国建立，欧洲进入拿破仑战争时代。' },
+  { y:1804, t:'海地独立', p:'海地 · 太子港', c:'independence', wiki:'海地', lng:-72.3074, lat:18.5944, d:'海地宣布独立，成为拉丁美洲第一个独立国家，也是世界上第一个黑人共和国。' },
+  { y:1815, t:'滑铁卢战役', p:'比利时 · 滑铁卢', c:'war', wiki:'滑铁卢战役', lng:4.4111, lat:50.6978, d:'拿破仑在滑铁卢被英普联军击败，百日王朝终结；战胜国随后建立维也纳体系，重新划分欧洲版图。' },
+  { y:1810, t:'拉普拉塔独立运动', p:'阿根廷 · 布宜诺斯艾利斯', c:'independence', wiki:'五月革命', lng:-58.3816, lat:-34.6037, d:'圣马丁等领导拉普拉塔地区起义，布宜诺斯艾利斯建立地方洪达，南美南部独立运动起步。' },
+  { y:1819, t:'博亚卡战役', p:'哥伦比亚 · 波哥大', c:'independence', wiki:'博亚卡战役', lng:-74.0721, lat:4.7110, d:'玻利瓦尔率军翻越安第斯山，在博亚卡击败西班牙殖民军，奠定新格拉纳达地区独立的基础。' },
+  { y:1821, t:'墨西哥独立', p:'墨西哥 · 墨西哥城', c:'independence', wiki:'墨西哥独立战争', lng:-99.1332, lat:19.4326, d:'墨西哥宣布脱离西班牙独立，伊图尔维德一度建立墨西哥帝国，共和制度随后逐步确立。' },
+  { y:1822, t:'巴西独立', p:'巴西 · 里约热内卢', c:'independence', wiki:'巴西独立', lng:-43.1729, lat:-22.9068, d:'葡萄牙王子佩德罗宣布巴西脱离葡萄牙独立，建立巴西帝国，南美最大国家保持了统一。' },
+  { y:1823, t:'门罗主义发表', p:'美国 · 华盛顿', c:'diplomacy', wiki:'门罗主义', lng:-77.0365, lat:38.8977, d:'美国总统门罗发表咨文，宣称美洲不再对欧洲列强殖民开放，奠定美国在西半球扩张的基调。' },
+  { y:1825, t:'玻利维亚独立', p:'玻利维亚 · 苏克雷', c:'independence', wiki:'玻利维亚', lng:-65.2559, lat:-19.0196, d:'上秘鲁宣布独立，以解放者玻利瓦尔之名命名为玻利维亚，南美解放战争基本结束。' },
+  { y:1840, t:'鸦片战争爆发', p:'中国 · 广州', c:'war', wiki:'鸦片战争', lng:113.2644, lat:23.1291, d:'英国发动侵华战争，清政府战败后签订《南京条约》，割让香港岛、开放五口通商，中国开始沦为半殖民地半封建社会。' },
+  { y:1848, t:'《共产党宣言》发表', p:'英国 · 伦敦', c:'society', wiki:'共产党宣言', lng:-0.1278, lat:51.5074, d:'马克思、恩格斯在伦敦发表《共产党宣言》，科学社会主义诞生，深刻影响此后一个多世纪的工人运动与政治变革。' },
+  { y:1848, t:'欧洲革命浪潮', p:'法国 · 巴黎', c:'revolution', wiki:'1848年革命', lng:2.3522, lat:48.8566, d:'巴黎二月革命推翻七月王朝，革命浪潮随后席卷德意志、奥地利、意大利等国，民族统一与民主诉求交织。' },
+  { y:1851, t:'金田起义 · 太平天国', p:'中国 · 广西桂平', c:'revolution', wiki:'太平天国', lng:110.08, lat:23.39, d:'洪秀全在广西金田村起义、建号太平天国，这场内战持续十余年，席卷长江流域，沉重冲击清朝统治。' },
+  { y:1853, t:'克里米亚战争', p:'奥斯曼 · 伊斯坦布尔', c:'war', wiki:'克里米亚战争', lng:28.9784, lat:41.0082, d:'奥斯曼帝国联合英、法与俄国交战，新式线膛武器、铁路与电报首次大规模接受战争检验，俄国国际地位受挫。' },
+  { y:1857, t:'印度民族大起义', p:'印度 · 德里', c:'revolution', wiki:'印度民族起义', lng:77.2090, lat:28.6139, d:'印度土兵与民众起义反抗英国东印度公司；起义失败后，印度转为英国王室直辖殖民统治。' },
+  { y:1859, t:'《物种起源》出版', p:'英国 · 伦敦', c:'tech', wiki:'物种起源', lng:-0.1278, lat:51.5074, d:'达尔文在伦敦出版《物种起源》，提出以自然选择为核心的演化理论，重塑人类对生命起源与物种关系的认识。' },
+  { y:1861, t:'意大利王国成立', p:'意大利 · 都灵', c:'independence', wiki:'意大利统一', lng:7.6869, lat:45.0703, d:'撒丁王国主导下意大利王国宣告成立，加里波第远征两西西里，半岛统一进程基本完成。' },
+  { y:1861, t:'美国内战爆发', p:'美国 · 萨姆特堡', c:'war', wiki:'南北战争', lng:-79.8927, lat:32.7518, d:'南方邦联军炮击萨姆特堡，南北战争爆发；战争以联邦胜利告终，黑奴制度被废除，美国重新统一。' },
+  { y:1868, t:'日本明治维新', p:'日本 · 东京', c:'society', wiki:'明治维新', lng:139.6503, lat:35.6762, d:'日本推翻江户幕府，推行明治维新，全面学习西方的制度、工业与军事，迅速走上近代化与对外扩张道路。' },
+  { y:1869, t:'苏伊士运河通航', p:'埃及 · 塞得港', c:'society', wiki:'苏伊士运河', lng:32.2841, lat:31.2565, d:'苏伊士运河正式通航，连通地中海与红海，大幅缩短欧亚之间的航运距离，也加剧了列强对埃及的争夺。' },
+  { y:1871, t:'德意志统一', p:'法国 · 凡尔赛', c:'diplomacy', wiki:'德意志统一', lng:2.1304, lat:48.8049, d:'普法战争胜利后，德意志帝国在凡尔赛宫镜厅宣告成立，欧洲大陆力量对比与国际格局被重新划分。' },
+  { y:1871, t:'巴黎公社', p:'法国 · 巴黎', c:'revolution', wiki:'巴黎公社', lng:2.3522, lat:48.8566, d:'巴黎工人建立公社政权，仅存在七十二天即被镇压；这是无产阶级尝试建立自己政权的第一次实践。' },
+  { y:1884, t:'柏林会议 · 瓜分非洲', p:'德国 · 柏林', c:'diplomacy', wiki:'柏林会议(1884年)', lng:13.4050, lat:52.5200, d:'列强在柏林划定非洲势力范围与瓜分规则，十余年间非洲大陆被殖民国家分割殆尽，原住民疆界被强行改写。' },
+  { y:1885, t:'印度国民大会党成立', p:'印度 · 孟买', c:'society', wiki:'印度国民大会党', lng:72.8777, lat:19.0760, d:'印度国民大会党在孟买成立，最初诉求有限自治，后来逐渐成为领导印度独立运动的核心政治力量。' },
+  { y:1894, t:'甲午中日战争爆发', p:'黄海海域', c:'war', wiki:'甲午战争', lng:123.7, lat:36.0, d:'日本挑起甲午战争，清政府战败后签订《马关条约》，割让台湾及澎湖列岛，承认朝鲜独立，东亚格局重挫。' },
+  { y:1896, t:'阿杜瓦战役', p:'埃塞俄比亚 · 阿杜瓦', c:'war', wiki:'阿杜瓦战役', lng:38.90, lat:14.17, d:'埃塞俄比亚军队在阿杜瓦击败意大利侵略军，是近代非洲国家击败欧洲列强、保住国家独立的标志性胜利。' },
+  { y:1898, t:'美西战争', p:'古巴 · 哈瓦那', c:'war', wiki:'美西战争', lng:-82.3666, lat:23.1136, d:'美国击败西班牙，夺取菲律宾、波多黎各，并取得古巴保护权，美国由此跻身海外殖民列强之列。' },
+  { y:1898, t:'戊戌变法', p:'中国 · 北京', c:'society', wiki:'戊戌变法', lng:116.4074, lat:39.9042, d:'康有为、梁启超等推动光绪帝推行维新改革，涉及官制、教育、实业与军事；百余日后被慈禧太后镇压，仅京师大学堂保留。' },
+  { y:1899, t:'布尔战争爆发', p:'南非 · 比勒陀利亚', c:'war', wiki:'第二次布尔战争', lng:28.2293, lat:-25.7479, d:'英国与南非布尔人共和国开战，游击战与集中营手段惨烈；战争推动英国重整帝国防务与殖民政策。' },
+  { y:1900, t:'八国联军侵华', p:'中国 · 北京', c:'war', wiki:'八国联军之役', lng:116.4074, lat:39.9042, d:'英、法、德、俄、美、日、意、奥联军攻占北京，清政府被迫签订《辛丑条约》，赔款深重，民族危机空前。' },
+  { y:1903, t:'莱特兄弟首次动力飞行', p:'美国 · 基蒂霍克', c:'tech', wiki:'莱特兄弟', lng:-75.6627, lat:36.0633, d:'莱特兄弟在北卡罗来纳州基蒂霍克完成人类首次持续、可控的动力载人飞行，航空时代由此开启。' },
+  { y:1904, t:'巴拿马运河动工', p:'巴拿马 · 巴拿马城', c:'society', wiki:'巴拿马运河', lng:-79.5199, lat:8.9824, d:'巴拿马运河开工修建，1914 年通航，打通大西洋与太平洋之间的航运，改变了全球海运格局。' },
+  { y:1905, t:'对马海峡海战', p:'对马海峡', c:'war', wiki:'对马海峡海战', lng:129.3, lat:34.4, d:'日本海军全歼远航万里的俄国波罗的海舰队，日俄战争以日本胜利告终，东亚国际格局与俄国国内矛盾同时激化。' },
+  { y:1905, t:'俄国一九〇五年革命', p:'俄国 · 圣彼得堡', c:'revolution', wiki:'1905年俄国革命', lng:30.3351, lat:59.9343, d:'冬宫流血事件引发全国罢工、起义与兵变，沙皇被迫设立国家杜马；这次革命被视为一九一七年革命的预演。' },
+  { y:1908, t:'青年土耳其革命', p:'奥斯曼 · 伊斯坦布尔', c:'revolution', wiki:'青年土耳其运动', lng:28.9784, lat:41.0082, d:'青年土耳其党人迫使苏丹恢复宪法、推翻专制统治，随后掌握政权，奥斯曼帝国在衰落中谋求近代化改革。' },
+  { y:1910, t:'墨西哥革命', p:'墨西哥 · 墨西哥城', c:'revolution', wiki:'墨西哥革命', lng:-99.1332, lat:19.4326, d:'迪亚斯独裁统治被推翻，墨西哥爆发长期革命与内战；1917 年颁布具深刻社会改革内容的新宪法。' },
+  { y:1911, t:'武昌起义 · 辛亥革命', p:'中国 · 武汉', c:'revolution', wiki:'辛亥革命', lng:114.3055, lat:30.5928, d:'武昌新军起义爆发，各省纷纷响应宣布独立，辛亥革命终结清朝统治，延续两千余年的帝制走向崩塌。' },
+  { y:1912, t:'中华民国成立', p:'中国 · 南京', c:'diplomacy', wiki:'中华民国', lng:118.7969, lat:32.0603, d:'中华民国临时政府在南京成立，孙中山就任临时大总统，共和政体取代君主专制，随后进入北洋纷争时期。' },
+  { y:1914, t:'萨拉热窝事件', p:'波斯尼亚 · 萨拉热窝', c:'war', wiki:'萨拉热窝事件', lng:18.4131, lat:43.8563, d:'奥匈帝国皇储斐迪南大公在萨拉热窝遇刺，奥匈随即向塞尔维亚宣战，成为第一次世界大战的导火索。' },
+  { y:1914, t:'马恩河战役', p:'法国 · 巴黎近郊', c:'war', wiki:'第一次马恩河战役', lng:2.5, lat:49.0, d:'英法联军在马恩河一线击退德军，德军速战速决的施里芬计划破产，西线由此转入漫长的堑壕对峙。' },
+  { y:1916, t:'凡尔登战役', p:'法国 · 凡尔登', c:'war', wiki:'凡尔登战役', lng:5.3853, lat:49.1597, d:'德法两军在凡尔登激战数月，双方伤亡合计逾七十万，战线反复拉锯，被称为战争中的“绞肉机”。' },
+  { y:1917, t:'俄国十月革命', p:'俄国 · 彼得格勒', c:'revolution', wiki:'十月革命', lng:30.3351, lat:59.9343, d:'布尔什维克在彼得格勒发动武装起义，推翻临时政府，建立苏维埃政权，世界上第一个社会主义国家诞生。' },
+  { y:1917, t:'美国参战', p:'美国 · 华盛顿', c:'war', wiki:'美国参加第一次世界大战', lng:-77.0365, lat:38.8977, d:'德国无限制潜艇战与外交密件促使美国对德宣战，加入协约国一方，物资与兵力注入改变了一战的力量对比。' },
+  { y:1918, t:'康边停战协定', p:'法国 · 贡比涅', c:'diplomacy', wiki:'贡比涅停战协定', lng:2.8281, lat:49.4183, d:'德国在贡比涅森林的列车上签署停战协定，第一次世界大战结束；战后和约的苛刻安排为下一场危机埋下伏笔。' },
+  { y:1919, t:'巴黎和会 · 凡尔赛和约', p:'法国 · 巴黎', c:'diplomacy', wiki:'巴黎和会', lng:2.3522, lat:48.8566, d:'战胜国召开巴黎和会，签订《凡尔赛和约》重划欧洲版图、瓜分殖民地，并对德国施加巨额赔款与军备限制。' },
+  { y:1919, t:'五四运动', p:'中国 · 北京', c:'revolution', wiki:'五四运动', lng:116.4074, lat:39.9042, d:'巴黎和会外交失败引发北京学生游行，运动席卷全国，推动新文化传播、工人登上政治舞台，影响了此后中国的走向。' },
+  { y:1919, t:'阿姆利则惨案', p:'印度 · 阿姆利则', c:'war', wiki:'阿姆利则惨案', lng:74.8723, lat:31.6340, d:'英军向印度阿姆利则的和平集会人群开枪，死伤惨重；惨案激化印度民众反英情绪，独立运动走向高涨。' },
+  { y:1921, t:'中国共产党成立', p:'中国 · 上海', c:'society', wiki:'中国共产党第一次全国代表大会', lng:121.4737, lat:31.2304, d:'中共一大在上海召开（后转移至嘉兴南湖），中国共产党成立，此后逐步成长为影响中国命运的政治力量。' },
+  { y:1922, t:'苏联成立', p:'苏俄 · 莫斯科', c:'society', wiki:'苏联', lng:37.6173, lat:55.7558, d:'俄罗斯、乌克兰、白俄罗斯与外高加索联邦共同组成苏维埃社会主义共和国联盟，苏联正式成立。' },
+  { y:1929, t:'华尔街股灾 · 大萧条', p:'美国 · 纽约', c:'society', wiki:'大萧条', lng:-74.0060, lat:40.7128, d:'华尔街股市崩盘，引发席卷资本主义世界的经济大萧条，失业与破产蔓延，推动各国调整经济政策与国际秩序。' },
+  { y:1930, t:'甘地食盐进军', p:'印度 · 达迪', c:'independence', wiki:'食盐进军', lng:72.9000, lat:20.8806, d:'甘地率追随者步行至海边自制食盐，反抗英国食盐专卖法，掀起印度全国性的公民不服从运动。' },
+  { y:1931, t:'九一八事变', p:'中国 · 沈阳', c:'war', wiki:'九一八事变', lng:123.4315, lat:41.8057, d:'关东军炸毁南满铁路路轨并进攻沈阳，随后侵占中国东北，日本局部侵华战争开始，中国人民率先举起反法西斯旗帜。' },
+  { y:1933, t:'罗斯福新政', p:'美国 · 华盛顿', c:'society', wiki:'罗斯福新政', lng:-77.0365, lat:38.8977, d:'罗斯福就任美国总统，以一系列工赈、金融监管与社会保障措施推行新政，扩大政府对经济与社会生活的干预。' },
+  { y:1935, t:'意大利入侵埃塞俄比亚', p:'埃塞俄比亚 · 亚的斯亚贝巴', c:'war', wiki:'意大利入侵埃塞俄比亚', lng:38.7625, lat:9.0107, d:'意大利军队入侵埃塞俄比亚，使用毒气并轰炸平民，次年占领首都；国际联盟的制裁软弱无力，侵略野心受到纵容。' },
+  { y:1937, t:'卢沟桥事变 · 全面抗战', p:'中国 · 北京卢沟桥', c:'war', wiki:'卢沟桥事变', lng:115.9835, lat:39.8586, d:'日军在卢沟桥挑起事端并发动进攻，中国全面抗战爆发，国共第二次合作形成，中国战场成为东方反法西斯主战场。' },
+  { y:1939, t:'德国入侵波兰', p:'波兰 · 华沙', c:'war', wiki:'入侵波兰', lng:21.0122, lat:52.2297, d:'德军以闪击战入侵波兰，英法对德宣战，第二次世界大战全面爆发；波兰在德苏夹击下很快沦陷。' },
+  { y:1940, t:'不列颠之战', p:'英国 · 伦敦', c:'war', wiki:'不列颠之战', lng:-0.1278, lat:51.5074, d:'德国空军大规模空袭英国本土，英国空军顽强抵抗；由于未能取得制空权，德国登陆英国的计划被迫搁置。' },
+  { y:1941, t:'珍珠港事件', p:'夏威夷 · 檀香山', c:'war', wiki:'偷袭珍珠港', lng:-157.8581, lat:21.3099, d:'日本偷袭美国珍珠港海军基地，美军太平洋舰队遭受重创；美国正式参战，太平洋战争爆发，二战达到最大规模。' },
+  { y:1942, t:'斯大林格勒战役', p:'苏联 · 斯大林格勒', c:'war', wiki:'斯大林格勒战役', lng:44.5133, lat:48.7080, d:'苏德两军在斯大林格勒逐屋血战，德军第六集团军覆灭，成为二战东线乃至整个战争的转折点。' },
+  { y:1942, t:'阿拉曼战役', p:'埃及 · 阿拉曼', c:'war', wiki:'第二次阿拉曼战役', lng:28.9500, lat:30.8333, d:'英军在北非阿拉曼击败德意联军，轴心国军队被迫西撤，北非战局由此扭转，地中海通道逐步敞开。' },
+  { y:1944, t:'诺曼底登陆', p:'法国 · 诺曼底', c:'war', wiki:'诺曼底战役', lng:-0.85, lat:49.35, d:'盟军在法国诺曼底海岸大规模登陆，开辟欧洲第二战场，德军陷入东西两线夹击，纳粹德国崩溃加速。' },
+  { y:1945, t:'雅尔塔会议', p:'苏联 · 雅尔塔', c:'diplomacy', wiki:'雅尔塔会议', lng:34.1973, lat:44.4948, d:'美、英、苏首脑在雅尔塔会晤，商定对德处置、战后国际组织安排与势力范围划分，深刻影响战后世界秩序。' },
+  { y:1945, t:'德国投降', p:'德国 · 柏林', c:'diplomacy', wiki:'德国投降', lng:13.4050, lat:52.5200, d:'柏林被攻克后，德国宣布无条件投降，欧洲战事结束；德国随后被美、英、苏、法分区占领。' },
+  { y:1945, t:'广岛原子弹', p:'日本 · 广岛', c:'war', wiki:'广岛市原子弹爆炸', lng:132.4553, lat:34.3853, d:'美军向广岛投掷原子弹，造成大量平民伤亡；随后苏联对日宣战，日本走向投降，核武器也开启了新的时代阴影。' },
+  { y:1945, t:'日本投降 · 二战结束', p:'日本 · 东京', c:'diplomacy', wiki:'第二次世界大战', lng:139.6503, lat:35.6762, d:'日本签署无条件投降书，第二次世界大战正式结束；战后国际社会建立联合国，致力于避免新的世界大战。' },
+  { y:1947, t:'印度独立与印巴分治', p:'印度 · 德里', c:'independence', wiki:'印巴分治', lng:77.2090, lat:28.6139, d:'英国移交权力，按宗教界线成立印度与巴基斯坦，独立伴随大规模教派迁徙与冲突，南亚次大陆格局长期延续。' },
+  { y:1948, t:'以色列建国', p:'巴勒斯坦 · 特拉维夫', c:'independence', wiki:'以色列建国', lng:34.7818, lat:32.0853, d:'以色列国宣告成立，随后爆发第一次中东战争，巴勒斯坦地区格局长期动荡，成为战后中东问题的核心之一。' },
+  { y:1949, t:'中华人民共和国成立', p:'中国 · 北京', c:'society', wiki:'中华人民共和国成立', lng:116.4074, lat:39.9042, d:'中华人民共和国在北京宣告成立，中国历史进入新阶段，也深刻改变了战后亚洲与世界的力量格局。' },
+];
+
+const MEDIA = {
+  0: { bv:'BV1Km6tBxEMb', pic:'https://i2.hdslb.com/bfs/archive/0243236093f4ff8a46a4d8c6dc1c0516e18f655f.jpg', vt:"“拿破仑加冕仪式”", au:"MNM寒冬" },
+  1: { bv:'BV19A4m1P7VN', pic:'https://i2.hdslb.com/bfs/archive/6a0478d1db65b40b2e5171a5488a00540059af8c.jpg', vt:"海地独立", au:"账号已注销" },
+  2: { bv:'BV1ga7pzrEyT', pic:'https://i0.hdslb.com/bfs/archive/60c831e5e8ca5a904481eb7ffa6ea9f70d281c6c.jpg', vt:"滑铁卢战役", au:"爱看电影的文鸯" },
+  4: { bv:'BV194411y79p', pic:'https://i1.hdslb.com/bfs/archive/4f001f7aa6766890acdd97e9981bab751e8fdae4.jpg', vt:"博亚卡战役：西蒙·玻利瓦尔建立大哥伦比亚共和国", au:"猫间中纳言" },
+  5: { bv:'BV11D4y157gP', pic:'https://i2.hdslb.com/bfs/archive/9b26a2c5d1159a9917a47bda0402b3f94ad5ba59.jpg', vt:"西语｜墨西哥历史：墨西哥独立战争的爆发和墨西哥的建国之路", au:"gossipedia" },
+  6: { bv:'BV1Th4y1W7Up', pic:'https://i2.hdslb.com/bfs/archive/2882321243cb4a1b3b2460b28c64b3ed03505d85.jpg', vt:"巴西独立史，葡萄牙王子不惜叛国，也要带领巴西独立", au:"菠菜说" },
+  7: { bv:'BV1VtraBUEMH', pic:'https://i1.hdslb.com/bfs/archive/b0b75bd59bce0d59ac5932e9c063e2066c6338b0.jpg', vt:"什么是“门罗主义”？“门罗主义”到“唐罗主义”", au:"故事汇1" },
+  9: { bv:'BV1Lwsme5EFw', pic:'https://i1.hdslb.com/bfs/archive/f19c7194e0c82c761a8e2d42a7a48b07809bc5a4.jpg', vt:"一口气看完鸦片战争", au:"上角看历史" },
+  10: { bv:'BV1EF41167dC', pic:'https://i0.hdslb.com/bfs/archive/ad09437a6590faea7f7fc56d755912391d166bc4.jpg', vt:"《共产党宣言》完整版朗读+国际歌", au:"底层逻辑2022" },
+  11: { bv:'BV1KPnR6QEjV', pic:'https://i1.hdslb.com/bfs/archive/fa60fb11d6dc691045071ab134cf61a6a92e6fa3.jpg', vt:"欧洲革命持续蔓延，西班牙也开始革命了！", au:"冷夜说" },
+  12: { bv:'BV1bZs26jEo3', pic:'https://i2.hdslb.com/bfs/archive/6760f586d5a34cf8eafa66db4d47913165768480.jpg', vt:"太平天国的那点事：金田起义前的最后一战", au:"帆哥的人文小屋" },
+  13: { bv:'BV1Yg4y1F7JW', pic:'https://i1.hdslb.com/bfs/archive/7600a5e93daf5ffc6f33beb2522910123284f2bb.jpg', vt:"克里米亚战争：一场被遗忘的帝国博弈·上【文明的故事】", au:"瑞克Zero" },
+  14: { bv:'BV1LZiQBwEx4', pic:'https://i0.hdslb.com/bfs/archive/4a02cb193e97794b9fcbb4401f2ff8cda5d2006d.jpg', vt:"弹壳引燃的抗争：印度民族大起义", au:"学历史很有趣" },
+  15: { bv:'BV1WKU3BZE9k', pic:'https://i2.hdslb.com/bfs/archive/9ff48fa21e468046ddeaf45443a2a3f645702028.jpg', vt:"物种起源出版", au:"文武收藏" },
+  16: { bv:'BV1TstBeEE4k', pic:'https://i0.hdslb.com/bfs/archive/9891634986393cc22ebd3d20dd160da4d219dc6e.jpg', vt:"觉醒与统一：意大利王国的建立之路", au:"导演AD蓝莓" },
+  17: { bv:'BV1XsWU6XEJo', pic:'https://i1.hdslb.com/bfs/archive/f50c0bd99c78172a8ea2ad98b9e938fc4de4f86b.jpg', vt:"【新】九下历史｜第3课 美国内战", au:"咩咩扬仔" },
+  18: { bv:'BV13dsA6fEMn', pic:'https://i0.hdslb.com/bfs/archive/75122e6539429e90aad1a931faef74ea2905874c.jpg', vt:"【新】九下历史｜第4课 日本明治维新｜补充亿些考点版", au:"咩咩扬仔" },
+  19: { bv:'BV1vqs66iEEd', pic:'https://i2.hdslb.com/bfs/archive/462d2f90855663f978c0cf494f06690fee16d5ef.jpg', vt:"历史上的今天：1869 年 11 月 17 日，苏伊士运河正式通航", au:"东方智慧-商业思维" },
+  20: { bv:'BV1w1wPe2EvT', pic:'https://i2.hdslb.com/bfs/archive/ce27d49093278742003ae319c274f8c7a74973d7.jpg', vt:"第12课第1目意大利、德意志统一国家的形成", au:"历史教学小叶子" },
+  21: { bv:'BV1BtZJYBE4G', pic:'https://i2.hdslb.com/bfs/archive/4a760f3323a516690bc1a37a6d8b6e85bfc781b0.jpg', vt:"震撼世界的72天：巴黎公社为何爆发？又为何失败？【历史调研室71】", au:"历史调研室" },
+  22: { bv:'BV1LbGtznEsb', pic:'https://i0.hdslb.com/bfs/archive/2cd9e4dc0b003eae5285c73aa19ab92c24cba065.jpg', vt:"探险家的好奇心，如何打开非洲地狱之门？【中非01丨柏林会议】", au:"小王Albert" },
+  24: { bv:'BV1YrsM6CEui', pic:'https://i2.hdslb.com/bfs/archive/9058919fd1c4ace24d6cde05a734bac83c8377a8.jpg', vt:"3D还原甲午海战：从列阵那一刻，北洋舰队就已经输了！", au:"尉迟杰my" },
+  25: { bv:'BV1x5411T7ku', pic:'https://i2.hdslb.com/bfs/archive/f2172db3d82b83e4b6c1a778cacc68305b841587.jpg', vt:"1896年--阿杜瓦战役，阿比西尼亚军队击溃意大利殖民军", au:"合成镜头" },
+  26: { bv:'BV1Qa41117D6', pic:'https://i2.hdslb.com/bfs/archive/a4be62af2478a38b8ed69dc4676f3ea9cc0ad5c1.jpg', vt:"【美西战争】美国迈出殖民扩张第一步，第一次帝国主义战争爆发！", au:"战史研究所" },
+  27: { bv:'BV1Rf7RzGEnm', pic:'https://i1.hdslb.com/bfs/archive/9ce7cb2f088ad8053c65f1ff208a4c67361a194b.jpg', vt:"历史上真实的“戊戌变法”为何会颠覆你的三观？", au:"蹲坑看历史" },
+  29: { bv:'BV1XnjxzQEM9', pic:'https://i1.hdslb.com/bfs/archive/7edd87b9095bcb694f2c42bea7036d67552f2a45.jpg', vt:"一口气看完八国联军侵华战争真实的前因后果！", au:"历史故事汇-" },
+  30: { bv:'BV1fy4y1o7Je', pic:'https://i0.hdslb.com/bfs/archive/708bf6d90441b3529cb099fc14b8454a7eb9a5e6.jpg', vt:"莱特兄弟和他们的飞行者1号【双语字幕】【飞行故事汇】", au:"上官Claire" },
+  34: { bv:'BV1bsNP6gEyu', pic:'https://i1.hdslb.com/bfs/archive/d8bec514b89ebeecad0d62ef8d00ab95fa41c162.jpg', vt:"1908年青年土耳其党革命：宪政恢复如何改变奥斯曼政治格局", au:"睡前历史局" },
+  35: { bv:'BV1So4y1u75P', pic:'https://i2.hdslb.com/bfs/archive/9d0e627870976d31227e91e3eae9fd637b02c2bf.jpg', vt:"天堂路远，美帝邻近，而农民军就在城下【墨西哥革命1】", au:"从不迟到的格鲁希" },
+  36: { bv:'BV1iQ4y197BR', pic:'https://i2.hdslb.com/bfs/archive/ebec8edcb9996c600126a4263904f85c14e9c37b.jpg', vt:"辛亥革命-武昌起义", au:"TEMHOE" },
+  37: { bv:'BV1tY4y1n7K6', pic:'https://i0.hdslb.com/bfs/archive/9db396a0e9b1f0c7eeda7c0093f066e17d6f9130.jpg', vt:"建党伟业_中华民国宣告成立", au:"翻滚火焰山" },
+  38: { bv:'BV17WWr63E9e', pic:'https://i2.hdslb.com/bfs/archive/e19a98222bd47f3ad846a84ff923634114c5b428.jpg', vt:"一战动画：萨拉热窝事件", au:"那个黄同学的动画剧场" },
+  39: { bv:'BV1ym4y1p7Zk', pic:'https://i2.hdslb.com/bfs/archive/76dec286c4965c1061bbf9820ce5c1a94b4a5b78.jpg', vt:"马恩河战役：施里芬计划是如何破产的？【一战的故事】", au:"瑞克Zero" },
+  40: { bv:'BV1Mj411E7c2', pic:'https://i0.hdslb.com/bfs/archive/47c3603dfd4771395ff68c72d2e517eda6c26794.jpg', vt:"凡尔登战役：一代法国人是如何毁掉的？【一战的故事】", au:"瑞克Zero" },
+  41: { bv:'BV1PCsu6wEec', pic:'https://i0.hdslb.com/bfs/archive/a7cc716b7ddfb26713565c6b0467e2a8887acead.jpg', vt:"50分钟细聊十月革命【中字+中配】", au:"史官小甲" },
+  42: { bv:'BV15J4m147eX', pic:'https://i1.hdslb.com/bfs/archive/7e317ba089e0ffd8258efe3efdeb9bed7ba15b04.jpg', vt:"美国参战：世界霸权从何而来？【一战的故事】", au:"瑞克Zero" },
+  43: { bv:'BV1gX4y1s7X4', pic:'https://i2.hdslb.com/bfs/archive/b3fb50548370c9f90a580dee3794d4253d26a107.jpg', vt:"第一次世界大战结束后的《康边停战协定》", au:"雍陌竹基巷" },
+  44: { bv:'BV1Yb421a7TN', pic:'https://i1.hdslb.com/bfs/archive/0b5157a6e20bc39116c86d1bd80b2bd8c7913591.jpg', vt:"“民国第一外交家”，在巴黎和会上舌战群儒，拒绝签字！", au:"电影新秀" },
+  45: { bv:'BV1Jy4y1t7zQ', pic:'https://i1.hdslb.com/bfs/archive/27f6b193d6cb257958f83d7f69c00f1d79b48e1c.jpg', vt:"【五四运动】每次看建党伟业这一段都热泪盈眶，青年人该有的样子！", au:"噼里啪啦葫芦娃哇" },
+  46: { bv:'BV1im7G66EMM', pic:'https://i2.hdslb.com/bfs/archive/2b93eb192031daf7ba9f2264ec50e017ba9fe875.jpg', vt:"英国对印度人最大的亏欠：阿姆利则惨案", au:"Choybalsan" },
+  47: { bv:'BV1qzg2zBE19', pic:'https://i1.hdslb.com/bfs/archive/4532c9072a8fab56bd8e6b6465ecda88062e7721.jpg', vt:"1921~2025，庆祝中国共产党成立104周年！此视频献给中国共产党成立104周年！", au:"小无辰" },
+  49: { bv:'BV1aX4y1n7Bc', pic:'https://i0.hdslb.com/bfs/archive/89ca1554bb4bff959aaa1b671c9804595ddd5c90.jpg', vt:"华尔街股灾有多疯狂？【美国往事02】", au:"皮猴小百合" },
+  50: { bv:'BV1GK421e7ze', pic:'https://i0.hdslb.com/bfs/archive/6375791bfd18fe475d1e85c50dd42f66762502b1.jpg', vt:"甘地食盐进军：一场震撼印度的非暴力抵抗", au:"马浩宁大大的狗" },
+  51: { bv:'BV1RT421Y7pW', pic:'https://i2.hdslb.com/bfs/archive/26824fe4d893fba6528501c4a9aaa1cdfafe1631.jpg', vt:"你真的了解“九一八事变”吗？超详细，上帝视角还原：九一八事变", au:"奔放的小豆豆吖" },
+  52: { bv:'BV1TVG1zsEWC', pic:'https://i0.hdslb.com/bfs/archive/162b76112a860dcaa8dfc3c41db8ae38a3315956.jpg', vt:"前方左转 ! 罗斯福新政如何重塑美国国家机器!—罗斯福（中）", au:"酒痴东梦" },
+  53: { bv:'BV1DJ411K7Pi', pic:'https://i0.hdslb.com/bfs/archive/193fad013e2345c798254de5b6631a3cfcd7cb41.jpg', vt:"意大利入侵埃塞俄比亚", au:"青鸾馆馆主" },
+  54: { bv:'BV12H4y1c7ub', pic:'https://i2.hdslb.com/bfs/archive/beb521eef253109b97346efc4021cc058cb6b0c9.jpg', vt:"一口气看完七七事变，卢沟桥事变始末，中华民族全面抗战的起点", au:"百晓生探影" },
+  55: { bv:'BV1ps41127d2', pic:'https://i2.hdslb.com/bfs/archive/7d93362a451ae3a2c54fd135387b90cd3295e97b.jpg', vt:"彩色录像-入侵波兰 1939", au:"Philex95" },
+  56: { bv:'BV1p2bSzKEAh', pic:'https://i0.hdslb.com/bfs/archive/9e2b83b96fa11693429e24cf34a31ca3608cee33.jpg', vt:"不列颠之战【空战影片】1080P", au:"剑齿虎影视" },
+  57: { bv:'BV1Wc5wzhEdC', pic:'https://i1.hdslb.com/bfs/archive/852cee91851dc99ad8fad3804793f8d489966482.jpg', vt:"珍珠港事件：惊天豪赌！日本为什么敢打美国？【三木说22】", au:"三木説" },
+  58: { bv:'BV12B5F67Eit', pic:'https://i2.hdslb.com/bfs/archive/b69fbe1f7a9bc29a770525706f555a9cd4a4247a.jpg', vt:"一个视频看懂二战转折点：斯大林格勒战役！【三木说】", au:"三木説" },
+  60: { bv:'BV14P4y1A7UG', pic:'https://i2.hdslb.com/bfs/archive/a06d2d61ac2972365aabbe43717f2ebe5c764b07.jpg', vt:"史上最大规模的登陆作战：诺曼底登陆，是如何成功的？【历史调研室】", au:"历史调研室" },
+  61: { bv:'BV1MwYvzyEJE', pic:'https://i0.hdslb.com/bfs/archive/ce0cc3cb83dc3950c979169a206497c65690e8b2.jpg', vt:"雅尔塔会议：三巨头如何决定世界命运？【迷糊豆老师·冷战史1】", au:"迷糊豆老师" },
+  63: { bv:'BV1pz4y1H7yh', pic:'https://i1.hdslb.com/bfs/archive/11c2c47b13f1d8ecfd7369ad435921d09679c55d.jpg', vt:"1945年，广岛原子弹爆炸后真实录像，人被瞬间蒸发在地上留下黑影", au:"纪录片YL" },
+  64: { bv:'BV1hqbHzBEs5', pic:'https://i2.hdslb.com/bfs/archive/2992df24411db02013c032a7d62b42cd17b3705f.jpg', vt:"日本投降影视视频【4k高清】", au:"账号已注销" },
+  65: { bv:'BV1JAnG6HETt', pic:'https://i2.hdslb.com/bfs/archive/947f23942b72e73f716a3571993bba3a38a5e50d.png', vt:"汗青堂150《午夜时分的解放》：1947印度独立与印巴分治的血色黎明", au:"飞跃什么海" },
+  66: { bv:'BV16T4y177e6', pic:'https://i0.hdslb.com/bfs/archive/6d1c29c5e19c6a1210fcc1b38f848fe510fcbda4.jpg', vt:"以色列建国梦（法国，1960，中文字幕）", au:"贾浪仙和孟东野" },
+  67: { bv:'BV14shYzPE24', pic:'https://i0.hdslb.com/bfs/archive/da2004304b6adab82b846b28d642559effeb62fc.jpg', vt:"高中历史｜一轮复习｜第09讲《中华人民共和国成立和社会主义革命与建设》", au:"小马历史课堂" }
+};
+
+const KP = {
+  0: ["1804 年拿破仑在巴黎圣母院加冕，自行戴上皇冠，宣示权力不来自教会。", "第一帝国颁布《民法典》（拿破仑法典），确立近代私有财产与契约原则，影响遍及欧洲。"],
+  1: ["原为法国殖民地圣多明各，杜桑·卢维杜尔领导黑奴起义，1804 年宣布独立。", "它是拉美第一个独立国家、世界第一个黑人共和国，动摇了大西洋奴隶殖民体系。"],
+  2: ["1815 年拿破仑复辟（百日王朝）后，在滑铁卢被威灵顿统率的英普联军击败。", "战败后拿破仑第二次退位，维也纳体系确立，欧洲恢复旧王朝秩序。"],
+  3: ["1810 年布宜诺斯艾利斯爆发五月革命，成立地方洪达，拉开南美南部独立序幕。", "圣马丁率军解放智利、秘鲁，与玻利瓦尔南北呼应，推动西属美洲殖民地独立。"],
+  4: ["1819 年玻利瓦尔率军翻越安第斯山，在博亚卡击溃西班牙殖民军。", "战役胜利促成新格拉纳达与委内瑞拉合并，建立大哥伦比亚共和国。"],
+  5: ["1810 年伊达尔戈号召起义，战争延续十余年，1821 年墨西哥宣布脱离西班牙。", "独立后经历帝国与共和反复，边疆与社会结构长期动荡。"],
+  6: ["1822 年葡萄牙王子佩德罗宣布巴西独立，建立巴西帝国。", "与西属美洲不同，巴西以君主制过渡，避免了领土分裂，成为南美最大国家。"],
+  7: ["1823 年美国总统门罗发表咨文，宣称美洲不再向欧洲殖民开放。", "口号“美洲是美洲人的美洲”，后被美国用作向拉丁美洲扩张的依据。"],
+  8: ["1825 年上秘鲁宣布独立，以解放者玻利瓦尔之名命名玻利维亚。", "至此南美解放战争基本结束，西属南美殖民地相继建立共和国。"],
+  9: ["1840 年英国以虎门销烟为借口发动战争，1842 年清政府签订《南京条约》。", "条约割让香港岛、开放五口通商并协定关税，中国开始沦为半殖民地半封建社会。"],
+  10: ["1848 年马克思、恩格斯在伦敦发表《共产党宣言》，阐明阶级斗争与科学社会主义理论。", "它标志着马克思主义诞生，为此后工人运动与社会主义实践提供思想纲领。"],
+  11: ["1848 年巴黎二月革命推翻七月王朝，革命迅速蔓延到德意志、奥地利、意大利等地。", "诉求交织民主改革、民族统一与工人权益；革命虽多被镇压，但改变了欧洲政治走向。"],
+  12: ["1851 年洪秀全在广西金田起义，建号太平天国，1853 年定都天京（南京）。", "内战持续十余年，席卷长江流域，沉重打击清朝统治，也深刻影响晚清政局。"],
+  13: ["1853—1856 年奥斯曼联合英、法对俄国作战，战场在克里米亚半岛及黑海沿岸。", "战争检验了线膛步枪、蒸汽船、铁路与电报，俄国战败后转向国内改革与远东扩张。"],
+  14: ["1857 年印度土兵因涂油子弹事件起义，德里、勒克瑙等地民众响应。", "起义失败后英国撤销东印度公司，印度转为英国王室直辖殖民统治。"],
+  15: ["1859 年达尔文在伦敦出版《物种起源》，提出自然选择与共同演化的理论。", "进化论重塑了人类对生命起源、物种关系及人与自然界位置的认识。"],
+  16: ["1861 年撒丁王国主导下意大利王国成立，加里波第远征解放两西西里。", "此后威尼斯、罗马相继并入，半岛统一在 1871 年完成。"],
+  17: ["1861 年南方邦联军炮击萨姆特堡，南北战争爆发，核心矛盾是奴隶制与联邦统一。", "1865 年联邦胜利，第十三修正案废除黑奴制度，美国重新走向统一。"],
+  18: ["1868 年推翻江户幕府后，日本推行殖产兴业、文明开化与征兵制等改革。", "全面学习西方制度与科技，日本迅速近代化，同时走上对外扩张道路。"],
+  19: ["1869 年苏伊士运河通航，连通地中海与红海，欧亚海运距离大幅缩短。", "运河战略价值突出，成为英、法争夺埃及与东非势力范围的焦点。"],
+  20: ["1871 年普鲁士在普法战争胜利后，于凡尔赛宫镜厅宣告德意志帝国成立。", "统一改变欧洲大陆力量格局，德国崛起推动列强重新结盟与军备竞赛。"],
+  21: ["1871 年巴黎工人建立公社政权，推行选举、公职人员薪金限制等措施，仅存在 72 天。", "它是无产阶级尝试建立自身政权的第一次实践，深刻影响后世社会主义运动。"],
+  22: ["1884 年列强在柏林划定非洲势力范围与瓜分规则，确认有效占领原则。", "十余年间非洲大陆被分割殆尽，原住民疆界被强行改写，埋下后世冲突隐患。"],
+  23: ["1885 年国大党在孟买成立，初期诉求有限自治与经济改革。", "20 世纪起逐步领导印度民族独立运动，成为反英斗争的核心政党。"],
+  24: ["1894 年日本挑起战争，1895 年清政府签订《马关条约》。", "条约割让台湾及澎湖列岛、承认朝鲜独立并赔款二亿两白银，东亚格局遭受重挫。"],
+  25: ["1896 年埃塞俄比亚军队在阿杜瓦击败入侵的意大利军队。", "这是近代非洲国家击败欧洲列强、保住独立地位的标志性胜利。"],
+  26: ["1898 年美国击败西班牙，夺取菲律宾、波多黎各，并取得古巴保护权。", "战争标志美国跻身海外殖民列强，开始在太平洋与加勒比海扩张。"],
+  27: ["1898 年康有为、梁启超推动光绪帝推行维新，涉及官制、教育、实业与军事改革。", "百余日后被慈禧太后镇压，仅京师大学堂（北京大学前身）得以保留。"],
+  28: ["1899—1902 年英国与南非布尔人共和国交战，布尔人以游击战抵抗。", "战争中英军设立集中营，手段惨烈；战后英国重整帝国防务与殖民政策。"],
+  29: ["1900 年八国联军攻占北京，镇压义和团；1901 年《辛丑条约》赔款四亿五千万两。", "中国民族危机与社会矛盾空前激化，清廷统治合法性进一步动摇。"],
+  30: ["1903 年莱特兄弟在北卡罗来纳基蒂霍克完成首次持续、可控的动力载人飞行。", "飞行者一号留空 12 秒、飞行 36 米，航空时代由此开启。"],
+  31: ["1904 年巴拿马运河开工，1914 年通航，打通大西洋与太平洋之间的航运。", "运河改变全球海运格局，也强化了美国在中美洲的战略影响力。"],
+  32: ["1905 年日本海军在对马海峡全歼远航的俄国波罗的海舰队。", "日俄战争以日本胜利告终，东亚格局重构，俄国国内矛盾进一步激化。"],
+  33: ["1905 年冬宫流血事件引发全国罢工、起义与兵变，沙皇被迫设立国家杜马。", "这次革命被视为 1917 年革命的预演，暴露了沙皇制度的深层危机。"],
+  34: ["1908 年青年土耳其党人迫使苏丹恢复宪法、推翻专制统治，随后掌握政权。", "奥斯曼帝国在衰落中谋求近代化改革，民族主义与中央集权倾向增强。"],
+  35: ["1910 年迪亚斯独裁统治被推翻，墨西哥爆发长期革命与内战。", "1917 年宪法确立土地改革、劳工权益与资源国有原则，影响深远。"],
+  36: ["1911 年武昌新军起义，各省纷纷响应宣布独立，清朝统治土崩瓦解。", "辛亥革命终结两千余年帝制，建立共和政体，随后进入北洋纷争时期。"],
+  37: ["1912 年临时政府在南京成立，孙中山就任临时大总统。", "共和政体取代君主专制，民国初年经历政党竞争与北洋军阀混战。"],
+  38: ["1914 年奥匈皇储斐迪南大公在萨拉热窝被塞尔维亚青年刺杀。", "奥匈随后向塞尔维亚宣战，成为第一次世界大战的导火索。"],
+  39: ["1914 年英法联军在马恩河一线击退德军，施里芬速胜计划破产。", "西线由此转入漫长堑壕对峙，机动战被阵地战取代。"],
+  40: ["1916 年德法两军在凡尔登激战数月，双方伤亡合计逾七十万。", "战役战线反复拉锯，被称为战争“绞肉机”，成为一战惨烈程度的象征。"],
+  41: ["1917 年布尔什维克在彼得格勒发动武装起义，推翻临时政府。", "世界上第一个社会主义国家诞生，深刻改变 20 世纪国际格局与革命思潮。"],
+  42: ["1917 年德国无限制潜艇战与齐默尔曼密电促使美国对德宣战。", "美国的物资与兵力注入协约国，加速了一战结束与战后美国地位上升。"],
+  43: ["1918 年德国在贡比涅森林列车上签署停战协定，一战结束。", "战后《凡尔赛和约》的苛刻安排，为 20 世纪 30 年代的危机埋下伏笔。"],
+  44: ["1919 年战胜国在巴黎和会重划欧洲版图、瓜分殖民地。", "对德国施加巨额赔款与军备限制，国际联盟成立，但未能持久维护和平。"],
+  45: ["1919 年巴黎和会外交失败引发北京学生游行，运动席卷全国。", "推动新文化传播与工人登上政治舞台，促进了马克思主义在中国的传播。"],
+  46: ["1919 年英军向印度阿姆利则和平集会人群开枪，造成大量死伤。", "惨案激化印度反英情绪，国大党领导的独立运动走向高涨。"],
+  47: ["1921 年中共一大在上海召开，后转移至嘉兴南湖游船。", "中国共产党成立，此后逐步成长为影响中国命运的政治力量。"],
+  48: ["1922 年俄罗斯、乌克兰、白俄罗斯与外高加索联邦组成苏联。", "社会主义联邦制国家建立，成为 20 世纪冷战格局中的一极。"],
+  49: ["1929 年华尔街股市崩盘，引发席卷资本主义世界的经济大萧条。", "失业与破产蔓延，推动各国调整经济政策，国家干预与福利制度兴起。"],
+  50: ["1930 年甘地率追随者步行至海边自制食盐，反抗英国食盐专卖法。", "非暴力抵抗运动席卷印度，提升了国大党的民众动员能力。"],
+  51: ["1931 年关东军炸毁南满铁路路轨并进攻沈阳，随后侵占中国东北。", "日本局部侵华战争开始，中国人民率先举起反法西斯旗帜。"],
+  52: ["1933 年罗斯福就任后推行工赈、金融监管、社会保障与公共工程等措施。", "新政扩大政府对经济与社会生活的干预，缓解了大萧条冲击。"],
+  53: ["1935 年意大利入侵埃塞俄比亚，使用毒气并轰炸平民，次年占领首都。", "国际联盟制裁软弱无力，侵略野心受到纵容，助长了法西斯扩张。"],
+  54: ["1937 年日军在卢沟桥挑起事端并发动进攻，中国全面抗战爆发。", "国共第二次合作形成，中国战场成为东方反法西斯主战场。"],
+  55: ["1939 年德军以闪击战入侵波兰，英法对德宣战，二战全面爆发。", "波兰在德苏夹击下很快沦陷，闪电战成为德军初期主要战法。"],
+  56: ["1940 年德国空军大规模空袭英国本土，英国空军顽强抵抗。", "未能取得制空权使德国登陆英国的计划搁置，西线进入相持。"],
+  57: ["1941 年日本偷袭珍珠港海军基地，美军太平洋舰队遭受重创。", "美国正式参战，太平洋战争爆发，二战达到最大规模。"],
+  58: ["1942—1943 年苏德两军在斯大林格勒逐屋血战，德军第六集团军覆灭。", "此役成为二战东线乃至整个战争的转折点，德军由攻转守。"],
+  59: ["1942 年英军在北非阿拉曼击败德意联军，轴心国军队被迫西撤。", "北非战局由此扭转，地中海通道逐步敞开，盟军获得反攻跳板。"],
+  60: ["1944 年盟军在法国诺曼底海岸大规模登陆，开辟欧洲第二战场。", "德军陷入东西两线夹击，纳粹德国崩溃加速。"],
+  61: ["1945 年美、英、苏首脑在雅尔塔会晤，商定对德处置与战后秩序。", "会议划分势力范围，深刻影响战后世界格局与冷战的形成。"],
+  62: ["1945 年柏林被攻克后，德国宣布无条件投降，欧洲战事结束。", "德国随后被美、英、苏、法分区占领，成为冷战对峙的前沿。"],
+  63: ["1945 年美军向广岛投掷原子弹，造成大量平民伤亡。", "核武器开启新的时代阴影，战后核威慑与军控成为国际议题。"],
+  64: ["1945 年日本签署无条件投降书，第二次世界大战正式结束。", "联合国成立，旨在维护战后和平；殖民体系开始松动瓦解。"],
+  65: ["1947 年英国移交权力，按宗教界线成立印度与巴基斯坦。", "独立伴随大规模教派迁徙与冲突，南亚次大陆格局长期延续。"],
+  66: ["1948 年以色列国宣告成立，随后爆发第一次中东战争。", "巴勒斯坦地区格局长期动荡，成为战后中东问题的核心之一。"],
+  67: ["1949 年在北京宣告成立，中国历史进入新阶段。", "深刻改变战后亚洲与世界力量格局，冷战东方阵营格局随之重塑。"]
+};
+
+/* ================= 教材考点：人物 / 地位 / 影响 ================= */
+const EXAM = {
+  0:  { people:"拿破仑·波拿巴", status:"法兰西第一帝国建立，欧洲进入拿破仑战争时代。", impact:"颁布《民法典》确立近代私有财产与契约原则，战争与法典深刻重塑欧洲封建秩序。" },
+  1:  { people:"杜桑·卢维杜尔", status:"拉丁美洲第一个独立国家，也是世界上第一个黑人共和国。", impact:"动摇了大西洋奴隶殖民体系，鼓舞了此后拉美各地的独立运动。" },
+  2:  { people:"拿破仑·波拿巴；威灵顿（英普联军统帅）", status:"拿破仑战争终结，百日王朝覆灭。", impact:"战胜国建立维也纳体系，欧洲暂时恢复旧王朝统治秩序。" },
+  3:  { people:"圣马丁", status:"南美南部独立运动拉开序幕。", impact:"推动西属南美殖民地解放，与玻利瓦尔南北呼应。" },
+  4:  { people:"玻利瓦尔", status:"奠定新格拉纳达地区独立的基础。", impact:"促成新格拉纳达与委内瑞拉合并，建立大哥伦比亚共和国。" },
+  5:  { people:"伊达尔戈（起义先驱）", status:"墨西哥脱离西班牙殖民统治。", impact:"独立后经历帝国与共和反复，拉美政治格局逐步重塑。" },
+  6:  { people:"佩德罗（葡萄牙王子）", status:"南美最大国家以君主制和平过渡实现独立。", impact:"避免了领土分裂，保持了巴西的统一。" },
+  7:  { people:"门罗（美国总统）", status:"美国对拉丁美洲政策的基石。", impact:"“美洲是美洲人的美洲”后被用作美国向拉美扩张的依据。" },
+  8:  { people:"玻利瓦尔", status:"南美解放战争基本结束。", impact:"西属南美殖民地相继建立共和国，独立版图基本形成。" },
+  9:  { people:"林则徐（虎门销烟）；道光帝", status:"中国近代史的开端，中国开始沦为半殖民地半封建社会。", impact:"签订《南京条约》，割香港岛、开放五口通商并协定关税，中国主权开始遭到破坏。" },
+  10: { people:"马克思、恩格斯", status:"马克思主义（科学社会主义）诞生的标志。", impact:"为此后国际工人运动与社会主义实践提供了思想纲领。" },
+  11: { people:"各国民主派与革命者", status:"1848 年遍及欧洲的民主改革与民族统一革命浪潮。", impact:"虽多被镇压，但改变了欧洲政治走向，民族统一诉求持续推进。" },
+  12: { people:"洪秀全", status:"近代规模最大的农民起义之一。", impact:"持续十余年，沉重打击清朝统治，深刻影响晚清政局。" },
+  13: { people:"英、法、奥斯曼联军对俄国", status:"近代第一场大规模检验新式武器与交通手段的战争。", impact:"俄国战败后转向国内改革与远东扩张，推动了军事技术革新。" },
+  14: { people:"章西女王等起义军民", status:"印度近代首次大规模反英武装起义。", impact:"失败后英国撤销东印度公司，印度转为英国王室直辖殖民统治。" },
+  15: { people:"达尔文", status:"生物进化论的奠基著作。", impact:"重塑了人类对生命起源、物种关系及人与自然位置的认识。" },
+  16: { people:"加里波第；撒丁王国", status:"意大利统一进程基本完成。", impact:"威尼斯、罗马相继并入，半岛统一在 1871 年最终完成。" },
+  17: { people:"林肯", status:"维护联邦统一、废除黑奴制度的内战。", impact:"第十三修正案废除奴隶制，为美国资本主义快速发展扫清障碍。" },
+  18: { people:"明治天皇；维新志士", status:"日本走上近代化道路的全面改革。", impact:"殖产兴业、文明开化使日本迅速富强，同时走上对外扩张道路。" },
+  19: { people:"运河工程与列强博弈各方", status:"连通地中海与红海的国际航运要道。", impact:"大幅缩短欧亚航程，成为英、法争夺埃及与东非势力范围的焦点。" },
+  20: { people:"俾斯麦；威廉一世", status:"德意志帝国建立，欧洲大陆力量格局重新划分。", impact:"德国崛起推动列强重新结盟与军备竞赛。" },
+  21: { people:"巴黎工人与公社委员", status:"无产阶级尝试建立自身政权的第一次实践。", impact:"仅存在 72 天即失败，但深刻影响了后世社会主义运动。" },
+  22: { people:"俾斯麦（会议主持）；欧洲列强", status:"列强划定非洲势力范围与瓜分规则的会议。", impact:"非洲大陆被分割殆尽，原住民疆界被强行改写，埋下后世冲突隐患。" },
+  23: { people:"印度民族运动领袖", status:"印度独立运动的核心政治政党。", impact:"20 世纪起领导反英斗争，推动印度自治与独立进程。" },
+  24: { people:"李鸿章；丁汝昌；日本明治政府", status:"东亚国际格局重挫，洋务运动遭受沉重打击。", impact:"《马关条约》割让台湾及澎湖列岛、赔款二亿两白银，民族危机加深。" },
+  25: { people:"孟尼利克二世（埃塞俄比亚）", status:"近代非洲国家击败欧洲列强、保住独立的标志性胜利。", impact:"鼓舞了非洲的民族自尊与反殖民斗争。" },
+  26: { people:"美国与西班牙", status:"美国跻身海外殖民列强的标志。", impact:"夺取菲律宾、波多黎各并控制古巴，美国向太平洋与加勒比海扩张。" },
+  27: { people:"康有为、梁启超、谭嗣同；光绪帝", status:"资产阶级性质的维新改革尝试。", impact:"百余日后失败，仅京师大学堂保留；推动了思想启蒙与社会变革。" },
+  28: { people:"英国与南非布尔人共和国", status:"帝国主义争夺南非殖民地的战争。", impact:"英军设立集中营手段惨烈，战后英国重整帝国防务与殖民政策。" },
+  29: { people:"义和团民众；慈禧太后与清政府", status:"中国半殖民地化程度进一步加深。", impact:"《辛丑条约》赔款四亿五千万两，民族危机与社会矛盾空前激化。" },
+  30: { people:"莱特兄弟（威尔伯、奥维尔）", status:"人类首次持续、可控的动力载人飞行。", impact:"开启了航空时代，深刻改变交通与战争形态。" },
+  31: { people:"运河工程建设各方", status:"打通大西洋与太平洋的国际航运要道。", impact:"改变全球海运格局，强化了美国在中美洲的战略影响力。" },
+  32: { people:"东乡平八郎；俄国波罗的海舰队", status:"日俄战争的决定性海战。", impact:"日本胜利重构东亚格局，同时激化俄国国内矛盾。" },
+  33: { people:"工人、士兵与布尔什维克", status:"1917 年俄国革命的一次预演。", impact:"暴露沙皇制度的深层危机，推动俄国社会变革。" },
+  34: { people:"青年土耳其党人", status:"奥斯曼帝国恢复宪政、谋求近代化改革。", impact:"帝国衰落中推行革新，民族主义与中央集权倾向增强。" },
+  35: { people:"墨西哥革命力量；迪亚斯（独裁者）", status:"反帝反封建的资产阶级民主革命。", impact:"1917 年宪法确立土地改革、劳工权益与资源国有原则，影响深远。" },
+  36: { people:"孙中山；黄兴；武昌新军", status:"终结延续两千余年的君主专制制度。", impact:"建立共和政体，民主共和观念传播，随后进入北洋纷争时期。" },
+  37: { people:"孙中山（临时大总统）", status:"亚洲较早建立的共和国之一，共和政体确立。", impact:"民主共和观念深入人心，民初经历政党竞争与军阀混战。" },
+  38: { people:"斐迪南大公；普林西普", status:"第一次世界大战的导火索。", impact:"奥匈向塞尔维亚宣战，欧洲列强相继卷入世界大战。" },
+  39: { people:"英法联军对德军", status:"德军速战速决的施里芬计划破产。", impact:"西线转入漫长堑壕对峙，机动战被阵地战取代。" },
+  40: { people:"德法两军", status:"一战惨烈程度的象征，被称为战争“绞肉机”。", impact:"双方伤亡合计逾七十万，战线反复拉锯，消耗战特征突出。" },
+  41: { people:"列宁；布尔什维克", status:"世界上第一个社会主义国家诞生。", impact:"深刻改变 20 世纪国际格局与革命思潮，并影响中国等国的革命道路。" },
+  42: { people:"威尔逊（美国总统）", status:"第一次世界大战力量对比发生转折。", impact:"物资与兵力注入协约国，加速一战结束并提升美国国际地位。" },
+  43: { people:"德国与协约国", status:"第一次世界大战结束。", impact:"战后和约的苛刻安排，为 20 世纪 30 年代的危机埋下伏笔。" },
+  44: { people:"威尔逊、劳合·乔治、克里孟梭", status:"一战后重新瓜分世界的分赃会议。", impact:"重划欧洲版图、瓜分殖民地；国际联盟成立，但未能持久维护和平。" },
+  45: { people:"青年学生；工人阶级；陈独秀、李大钊", status:"彻底反帝反封建的爱国革命运动，中国新民主主义革命的开端。", impact:"推动新文化传播与马克思主义在中国传播，工人阶级登上政治舞台。" },
+  46: { people:"戴尔（英军军官）；印度和平集会民众", status:"英国殖民当局血腥镇压印度民众的惨案。", impact:"激化印度反英情绪，国大党领导的独立运动走向高涨。" },
+  47: { people:"毛泽东、董必武等一大代表；陈独秀、李大钊（先驱）", status:"中国历史上开天辟地的大事变。", impact:"中国革命面貌焕然一新，此后逐步成长为影响中国命运的政治力量。" },
+  48: { people:"列宁；布尔什维克", status:"世界上第一个社会主义联邦制国家建立。", impact:"成为 20 世纪冷战国际格局中的一极。" },
+  49: { people:"胡佛与资本主义各国政府", status:"资本主义世界最严重的经济危机之一。", impact:"推动各国调整经济政策，国家干预与福利制度相继兴起。" },
+  50: { people:"甘地", status:"印度非暴力不合作运动的典范。", impact:"提升国大党的民众动员能力，推动印度独立进程。" },
+  51: { people:"日本关东军；东北抗日军民", status:"日本局部侵华战争开始，世界反法西斯斗争的先声。", impact:"中国东北沦陷，中国人民率先举起反法西斯旗帜。" },
+  52: { people:"罗斯福（美国总统）", status:"国家干预经济的资本主义改革范例。", impact:"缓解大萧条冲击，扩大了政府对经济与社会生活的干预。" },
+  53: { people:"墨索里尼；海尔·塞拉西一世", status:"法西斯国家侵略扩张的重要步骤。", impact:"国际联盟制裁软弱无力，侵略野心受到纵容，助长法西斯扩张。" },
+  54: { people:"国共两党与中国抗日军民", status:"中国全面抗战爆发，东方反法西斯主战场形成。", impact:"国共第二次合作形成，持久抗战长期牵制大量日军。" },
+  55: { people:"希特勒；德军", status:"第二次世界大战全面爆发。", impact:"闪击战成为德军初期主要战法，英法被迫对德宣战。" },
+  56: { people:"丘吉尔；英国空军；德国空军", status:"德国登陆英国的计划受挫。", impact:"未能取得制空权，西线进入相持，英国坚持抗战。" },
+  57: { people:"山本五十六；日本联合舰队", status:"太平洋战争爆发，第二次世界大战达到最大规模。", impact:"美国正式参战，世界反法西斯同盟力量壮大。" },
+  58: { people:"斯大林；朱可夫；德军第六集团军", status:"二战东线乃至整个战争的转折点。", impact:"德军由攻转守，法西斯集团由此走向溃败。" },
+  59: { people:"蒙哥马利；隆美尔", status:"北非战局的转折点。", impact:"轴心国军队被迫西撤，地中海通道逐步敞开，盟军获得反攻跳板。" },
+  60: { people:"艾森豪威尔；盟军", status:"欧洲第二战场开辟。", impact:"德军陷入东西两线夹击，纳粹德国崩溃加速。" },
+  61: { people:"罗斯福、丘吉尔、斯大林", status:"决定战后世界秩序的首脑会议。", impact:"划分势力范围，深刻影响战后格局与冷战的形成。" },
+  62: { people:"苏美英法盟军；纳粹德国", status:"欧洲战事结束。", impact:"德国随后被分区占领，成为冷战对峙的前沿。" },
+  63: { people:"美军与日本平民", status:"核武器首次用于实战。", impact:"加速日本投降，开启战后核威慑与军控的国际议题。" },
+  64: { people:"世界反法西斯同盟；日本", status:"第二次世界大战正式结束。", impact:"联合国成立以维护战后和平，殖民体系开始松动瓦解。" },
+  65: { people:"甘地；尼赫鲁；真纳；蒙巴顿", status:"英属印度独立，南亚次大陆格局形成。", impact:"伴随大规模教派迁徙与冲突，印巴两国格局长期延续。" },
+  66: { people:"本·古里安；犹太复国运动；当地阿拉伯居民", status:"战后中东问题的核心源头之一。", impact:"随后爆发第一次中东战争，巴勒斯坦地区长期动荡。" },
+  67: { people:"毛泽东；中国共产党与人民解放军", status:"中国人民从此站起来了，新民主主义革命取得基本胜利。", impact:"改变战后亚洲与世界力量格局，重塑冷战时期的东方阵营。" }
+};
+
+const YEARS = [...new Set(EVENTS.map(e=>e.y))].sort((a,b)=>a-b);
+const YEAR_MIN = YEARS[0], YEAR_MAX = YEARS[YEARS.length-1];
+
+/* ================= 主题课件库 ================= */
+const THEMES = [
+  {
+    id:'changzheng', name:'红军长征',
+    keys:['长征','红军','遵义','会宁'],
+    cover:{ title:'铭记历史，勿忘国耻', sub:'红军长征（1934—1936）', lead:'第五次反“围剿”失利后，中央红军被迫战略转移，纵横十余省、跋涉二万五千里，在极端艰难的条件下保存下革命骨干，铸就了伟大的长征精神。' },
+    slides:[
+      { h:'一、历史背景',
+        points:['第五次反“围剿”作战失利，根据地难以维持。','1934 年 10 月，中央红军从瑞金、于都等地出发，实行战略转移。','最初目标是突破封锁、北上与其他红军力量会合。'],
+        body:'由于军事指挥上的错误，中央红军未能打破国民党军队的第五次“围剿”，被迫离开南方根据地，踏上漫长的转移之路。长征是在敌我力量悬殊、补给极度困难的情况下进行的。',
+        notes:'考点提示：长征又称“二万五千里长征”；出发地为中央革命根据地（江西瑞金、福建长汀一带），直接原因是第五次反“围剿”失利。' },
+      { h:'二、伟大历程',
+        points:['1935 年 1 月遵义会议，确立了毛泽东在党和红军的领导地位。','四渡赤水、巧渡金沙江、强渡大渡河、飞夺泸定桥。','翻越雪山、穿过草地，1935 年 10 月中央红军到达陕北吴起镇。','1936 年 10 月，红一、二、四方面军在甘肃会宁会师，长征胜利结束。'],
+        body:'红军在崇山峻岭与江河草地之间转战，缺衣少食、前有堵截后有追兵，仍以顽强意志完成了二万五千里行军，途经十余个省份。遵义会议在危急关头挽救了党、挽救了红军、挽救了中国革命。',
+        notes:'考点提示：遵义会议是党的历史上生死攸关的转折点；会宁会师标志长征胜利结束；长征途中召开的重要会议、经典战例是常考内容。' },
+      { h:'三、历史意义',
+        points:['保存了中国共产党和红军的骨干力量。','在途经地区播下革命火种，扩大了革命影响。','铸就不怕牺牲、不畏艰难、团结奋进的长征精神。','为推动全民族抗战和中国革命的继续发展奠定了基础。'],
+        body:'长征的胜利，是中国革命转危为安的关键。它锻造了一支信念坚定、纪律严明的革命队伍，长征精神也成为后人克服艰难险阻的精神力量。',
+        notes:'考点提示：长征精神的核心是革命英雄主义与革命乐观主义；长征保存了党和红军的基干，为后来的抗日战争和解放战争准备了条件。' }
+    ],
+    related:[47,51,54]
+  },
+  {
+    id:'kangzhan', name:'中国人民抗日战争',
+    keys:['抗战','抗日战争','九一八','卢沟桥','七七','抗日'],
+    cover:{ title:'浴血抗战，民族脊梁', sub:'中国人民抗日战争（1931—1945）', lead:'从 1931 年九一八事变到 1945 年胜利，中国人民坚持十四年艰苦抗战，成为世界反法西斯战争的东方主战场。' },
+    slides:[
+      { h:'一、局部抗战开始',
+        points:['1931 年九一八事变，日军侵占中国东北。','东北人民和未撤走的东北军部队组织抗日义勇军。','中国人民率先举起反法西斯斗争的旗帜。'],
+        body:'关东军炸毁南满铁路路轨并进攻沈阳，随后侵占东北三省。面对侵略，东北民众开展长期游击抵抗，民族危机日益加深。' },
+      { h:'二、全民族抗战爆发',
+        points:['1937 年卢沟桥事变，中国全面抗战爆发。','国共第二次合作形成，工农红军改编为八路军、新四军。','正面战场与敌后战场相互配合，全民坚持抗战。'],
+        body:'日军在卢沟桥挑起事端并发动全面进攻，中国军队奋起抵抗。全国各阶层、各民族团结起来，开辟敌后抗日根据地，长期牵制和消耗日军力量。' },
+      { h:'三、胜利与意义',
+        points:['1945 年日本宣布无条件投降，抗日战争取得胜利。','中国战场是世界反法西斯战争的东方主战场。','抗战胜利是近代中国反抗外敌入侵的第一次完全胜利。','洗雪了民族耻辱，提高了中国的国际地位。'],
+        body:'十四年抗战付出了巨大民族牺牲，也锻造了空前的民族觉醒与团结。胜利捍卫了国家主权与领土完整，为战后中国的历史进程奠定了基础。' }
+    ],
+    related:[51,54,64]
+  },
+  {
+    id:'ww1', name:'第一次世界大战',
+    keys:['一战','第一次世界大战','萨拉热窝','凡尔登','马恩河','协约国'],
+    cover:{ title:'硝烟笼罩的欧洲', sub:'第一次世界大战（1914—1918）', lead:'两大军事集团的对抗与萨拉热窝导火索，引爆了席卷欧洲并波及世界的第一次大战，堑壕与重炮改变了战争形态。' },
+    slides:[
+      { h:'一、战争爆发',
+        points:['1914 年萨拉热窝事件，奥匈皇储遇刺。','奥匈向塞尔维亚宣战，欧洲列强相继卷入。','同盟国与协约国两大集团全面对抗。'],
+        body:'第二次工业革命后，欧洲列强在殖民地、军备与结盟体系上矛盾交织。萨拉热窝事件成为导火索，短短数周内主要大国相继参战。' },
+      { h:'二、主要战局',
+        points:['马恩河战役阻截德军，西线转入堑壕对峙。','凡尔登战役伤亡惨重，被称为战争中的“绞肉机”。','1917 年美国参战，改变了双方力量对比。'],
+        body:'战争从机动战陷入漫长的阵地战，机枪、火炮、工事与毒气造成巨大伤亡。东线、西线与南线交织，战事持续四年之久。' },
+      { h:'三、结束与遗产',
+        points:['1918 年德国签署停战协定，一战结束。','巴黎和会与《凡尔赛和约》重划欧洲版图。','苛刻的和约与未解决的矛盾，为下一场危机埋下伏笔。'],
+        body:'一战削弱了欧洲列强，动摇了旧的殖民秩序；战后建立的国际秩序并未带来持久和平，战败国的民族情绪与经济困境持续发酵。' }
+    ],
+    related:[38,39,40,42,43,44]
+  },
+  {
+    id:'ww2', name:'第二次世界大战',
+    keys:['二战','第二次世界大战','珍珠港','斯大林格勒','诺曼底','法西斯','原子弹'],
+    cover:{ title:'正义战胜邪恶', sub:'第二次世界大战（1939—1945）', lead:'法西斯国家的侵略扩张引发全球战争，世界反法西斯同盟协同作战，最终赢得和平，也推动了联合国的建立。' },
+    slides:[
+      { h:'一、战争全面爆发',
+        points:['1939 年德国闪击波兰，英法对德宣战。','德军在西线推进，不列颠之战挫败其登陆企图。','1941 年珍珠港事件后美国参战，战争达到最大规模。'],
+        body:'在一战后的经济危机与民族矛盾中，法西斯政权上台并对外扩张。战争先后在欧洲、北非、太平洋等战场展开，卷入国家与人口前所未有。' },
+      { h:'二、战略转折',
+        points:['斯大林格勒战役成为苏德战场与整个二战的转折点。','阿拉曼战役扭转北非战局。','1944 年诺曼底登陆，开辟欧洲第二战场。'],
+        body:'苏军在东线顽强防御并转入反攻，盟军在北非与大西洋逐步掌握主动权。东西两线夹击之下，轴心国军队节节败退。' },
+      { h:'三、胜利与战后秩序',
+        points:['1945 年德国投降，欧洲战事结束。','日本签署无条件投降书，二战正式结束。','战后建立联合国，致力于避免新的世界大战。','战争也留下核武器与和平秩序的深刻课题。'],
+        body:'第二次世界大战是人类历史上规模最大的战争，造成巨大人员与物质损失。战后国际社会总结教训，以集体安全机制维系和平，殖民体系也在战后加速瓦解。' }
+    ],
+    related:[55,56,57,58,59,60,62,63,64]
+  },
+  {
+    id:'opium', name:'近代中国的开端与民族危机',
+    keys:['鸦片战争','甲午','甲午战争','八国联军','南京条约','半殖民地'],
+    cover:{ title:'国门洞开，救亡图存', sub:'近代中国的开端（1840—1901）', lead:'列强接连发动侵略战争，清政府被迫签订一系列不平等条约，中国逐步沦为半殖民地半封建社会，也催生了近代化探索与救亡运动。' },
+    slides:[
+      { h:'一、鸦片战争与开端',
+        points:['1840 年英国发动鸦片战争。','清政府战败后签订《南京条约》，割让香港岛、开放五口通商。','中国开始沦为半殖民地半封建社会。'],
+        body:'英国为打开中国市场、扭转贸易逆差发动战争。战后一系列条约破坏了中国的领土完整与关税主权，传统天朝体制被迫面对近代国际关系。' },
+      { h:'二、危机加深',
+        points:['1894 年甲午中日战争爆发，战后签订《马关条约》。','台湾及澎湖列岛被割让，民族危机空前加深。','1900 年八国联军侵华，次年签订《辛丑条约》，赔款深重。'],
+        body:'列强掀起瓜分势力范围的狂潮，中国社会的半殖民地化程度不断加深。深重的民族危机促使各界人士思考国家出路，维新、革命等思潮相继兴起。' },
+      { h:'三、探索与觉醒',
+        points:['戊戌变法尝试制度层面的维新改革。','辛亥革命终结清朝统治，走向共和。','五四运动推动新思想传播，工人阶级登上政治舞台。'],
+        body:'从器物到制度再到思想文化，近代中国的探索层层深入。民族危机唤醒了民众的国家意识，为新的社会力量登上历史舞台准备了条件。' }
+    ],
+    related:[9,24,29,27,36,45]
+  },
+  {
+    id:'independence', name:'世界民族独立运动',
+    keys:['独立运动','民族解放','玻利瓦尔','甘地','印巴分治'],
+    cover:{ title:'挣脱殖民枷锁', sub:'近代世界民族独立浪潮', lead:'从拉丁美洲到亚洲、非洲，殖民地人民通过起义、战争与非暴力不合作等方式争取独立，重塑了近代世界的政治版图。' },
+    slides:[
+      { h:'一、拉丁美洲独立',
+        points:['海地成为拉美第一个独立国家，也是第一个黑人共和国。','玻利瓦尔、圣马丁领导南美解放斗争。','墨西哥、巴西、玻利维亚等相继摆脱殖民统治。'],
+        body:'受美国独立与法国大革命影响，拉美各地爆发起义。经过长期战争，西属、葡属殖民地先后建立独立国家，南美大陆保持了基本统一。' },
+      { h:'二、亚洲的抗争',
+        points:['印度民族大起义反抗英国殖民统治。','甘地领导食盐进军等公民不服从运动。','1947 年印度独立，按宗教界线实现印巴分治。'],
+        body:'印度民众以武装起义与和平抵制等多种方式争取自治与独立。独立过程伴随大规模教派迁徙与冲突，南亚次大陆的格局长期延续。' },
+      { h:'三、非洲的抵抗',
+        points:['1896 年阿杜瓦战役击败意大利侵略军。','埃塞俄比亚成为近代非洲保住国家独立的标志性国家。','殖民体系在战后逐步瓦解，民族国家纷纷建立。'],
+        body:'非洲人民多次武装反抗列强瓜分。阿杜瓦胜利鼓舞了非洲的民族自尊，二十世纪后半叶，非洲殖民地相继获得独立。' }
+    ],
+    related:[1,3,4,5,6,8,14,50,65,25]
+  },
+  {
+    id:'tech', name:'工业革命与科技发明',
+    keys:['工业革命','物种起源','达尔文','莱特兄弟','运河'],
+    cover:{ title:'科学改变世界', sub:'近代科技与工程突破', lead:'近代科学理论的突破与交通工程的革新，重塑了人类对生命、自然与时空的认识，也深刻改变了生产与全球联系。' },
+    slides:[
+      { h:'一、科学理论突破',
+        points:['1859 年达尔文出版《物种起源》，提出自然选择学说。','演化理论重塑人类对生命起源与物种关系的认识。','科学方法推动生物学、地质学等学科近代化。'],
+        body:'《物种起源》以大量观察证据论证生物由简单到复杂、由低级到高级的演化过程，打破了传统的物种不变观念，对思想界与科学界影响深远。' },
+      { h:'二、交通与工程革新',
+        points:['苏伊士运河通航，缩短欧亚航运距离。','巴拿马运河打通大西洋与太平洋之间的航线。','1903 年莱特兄弟完成人类首次动力载人飞行。'],
+        body:'运河工程改变了全球海运格局，降低了跨洋运输成本。动力飞行的成功则开启了航空时代，人类活动的空间从陆地、海洋扩展到天空。' },
+      { h:'三、技术与社会',
+        points:['科技进步提升了生产效率与联系速度。','工程革新也加剧了列强对通道与资源的争夺。','科学与工业相互推动，持续改变日常生活。'],
+        body:'近代科技不是孤立的发明，它与工业生产、殖民扩张和国家竞争交织在一起，既带来进步，也被卷入国际格局的博弈之中。' }
+    ],
+    related:[15,19,31,30]
+  },
+  {
+    id:'socialist', name:'社会主义思潮与革命',
+    keys:['共产党宣言','马克思','十月革命','巴黎公社','布尔什维克'],
+    cover:{ title:'改变世界的思潮', sub:'社会主义理论与革命实践', lead:'《共产党宣言》奠定科学社会主义基础，从巴黎公社的第一次尝试到十月革命建立苏维埃政权，社会主义运动深刻影响了二十世纪的世界。' },
+    slides:[
+      { h:'一、理论诞生',
+        points:['1848 年马克思、恩格斯发表《共产党宣言》。','科学社会主义诞生，指明工人运动的方向。','思潮深刻影响此后一个多世纪的政治变革。'],
+        body:'工业革命使社会阶级结构发生变化，工人阶级处境受到关注。《共产党宣言》系统阐述阶级斗争与社会发展规律，成为社会主义运动的纲领性文献。' },
+      { h:'二、政权尝试',
+        points:['1871 年巴黎公社是无产阶级建立政权的第一次实践。','公社仅存在七十二天即被镇压，经验与教训影响深远。','工人组织与社会主义政党在欧洲各国发展。'],
+        body:'巴黎工人在普法战争后的动荡中建立公社政权，尝试实行一系列社会改革。它虽然失败，却为后来的革命运动提供了宝贵经验。' },
+      { h:'三、俄国革命与传播',
+        points:['1917 年十月革命推翻临时政府，建立苏维埃政权。','世界上第一个社会主义国家诞生。','马克思主义随后传入中国，推动中国共产党成立。'],
+        body:'十月革命在帝国主义链条上打开缺口，开辟了新的历史时代。革命思想向世界各地传播，与各国工人运动、民族解放运动结合，重塑了二十世纪的政治版图。' }
+    ],
+    related:[10,21,41,47]
+  },
+  {
+    id:'newchina', name:'新中国诞生',
+    keys:['新中国','1949','开国大典','中华人民共和国'],
+    cover:{ title:'中国人民站起来了', sub:'中华人民共和国成立（1949）', lead:'经过长期革命斗争，1949 年中华人民共和国在北京宣告成立，中国历史进入新阶段，也深刻改变了战后亚洲与世界的力量格局。' },
+    slides:[
+      { h:'一、历史脉络',
+        points:['辛亥革命终结帝制，共和道路曲折探索。','五四运动推动新思想传播，工人阶级登上政治舞台。','中国共产党成立后，领导人民走向民族独立与人民解放。'],
+        body:'近代以来，无数志士寻求国家出路。在长期斗争中，新的政治力量逐步成熟，为全国解放和人民政权的建立准备了条件。' },
+      { h:'二、开国大典',
+        points:['1949 年中华人民共和国在北京宣告成立。','中国结束了半殖民地半封建的旧时代。','人民成为国家的主人，民族独立与人民解放基本实现。'],
+        body:'新中国的成立，标志着中国历史翻开新的一页。国家统一与民族团结逐步巩固，经济建设、社会改革与文化发展随之展开。' },
+      { h:'三、世界影响',
+        points:['深刻改变了战后亚洲的政治格局。','壮大了世界和平、民主与社会主义力量。','为落后国家争取民族独立提供了新的借鉴。'],
+        body:'新中国在复杂的国际环境中逐步站稳脚跟，以独立自主的姿态参与国际事务，对二十世纪后半叶的世界秩序产生了深远影响。' }
+    ],
+    related:[36,45,47,67]
+  }
+];
+
+/* ================= 状态与 DOM ================= */
+const wrap   = document.getElementById('mapWrap');
+const svg    = document.getElementById('map');
+const viewport = document.getElementById('viewport');
+const gGraticule = document.getElementById('graticule');
+const gLand  = document.getElementById('land');
+const gRealms = document.getElementById('realms');
+const gMarkers = document.getElementById('markers');
+const tooltip= document.getElementById('tooltip');
+const legend = document.getElementById('legend');
+const eraDesc= document.getElementById('eraDesc');
+const listEl = document.getElementById('eventList');
+const yearCount = document.getElementById('yearCount');
+const listCount = document.getElementById('listCount');
+const mapNote = document.getElementById('mapNote');
+const dd = document.getElementById('dd');
+const ddBtn = document.getElementById('ddBtn');
+const ddPop = document.getElementById('ddPop');
+const ddLabel = document.getElementById('ddLabel');
+const rangeMeta = document.getElementById('rangeMeta');
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+const overlay = document.getElementById('modalOverlay');
+
+const state = {
+  year: 1840,           // 'all' 或具体年份
+  query: '',
+  selected: null,
+  k: 1, tx: 0, ty: 0,
+  ddOpen: false,
+  showPlaces: false,
+  mode: 'map',
+  atlas: 'world',
+};
+
+/* 地图册：可选分区底图，bbox=[西经,南纬,东经,北纬] */
+const ATLAS = [
+  { id:'world',   name:'世界全图',       bbox:null },
+  { id:'china',   name:'中国近代史',     bbox:[73,18,135,54] },
+  { id:'europe',  name:'欧洲与一战战场', bbox:[-10,36,45,62] },
+  { id:'latam',   name:'拉丁美洲独立',   bbox:[-82,-55,-34,25] },
+  { id:'asia',    name:'亚洲与太平洋',   bbox:[60,-10,150,55] },
+  { id:'africa',  name:'非洲与中东',     bbox:[-18,-35,52,37] },
+];
+
+let proj = geoNaturalEarth1();
+let path = geoPath(proj);
+let landGeo = null;
+
+/* 年代疆域示意：按政权存续/扩张/解体年份在地图上叠加势力范围色块（教材示意，非精确历史边界）
+   bbox=[西经,南纬,东经,北纬]；kind: expand 扩张 / shrink 解体割让 / hold 政权存续 */
+const REALMS = [
+  { name:'拿破仑帝国', kind:'expand', from:1804, to:1815, bbox:[-5,42,10,54] },
+  { name:'拉美新独立诸国', kind:'expand', from:1810, to:1825, bbox:[-82,-55,-34,12] },
+  { name:'意大利统一', kind:'expand', from:1861, to:1871, bbox:[7,37,19,47] },
+  { name:'德意志帝国', kind:'expand', from:1871, to:1918, bbox:[6,47,16,55] },
+  { name:'奥斯曼帝国（解体）', kind:'shrink', from:1853, to:1918, bbox:[20,36,45,42] },
+  { name:'奥匈帝国（解体）', kind:'shrink', from:1914, to:1918, bbox:[11,42,26,51] },
+  { name:'英属印度', kind:'hold', from:1857, to:1947, bbox:[68,6,92,35] },
+  { name:'日本侵华扩张', kind:'expand', from:1931, to:1945, bbox:[124,30,146,46] }
+];
+
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc = s => String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+/* ================= 图例 ================= */
+function renderLegend(){
+  legend.innerHTML = `
+    <label class="legend-toggle">
+      <input type="checkbox" id="placeToggle">
+      <span class="lt-switch" aria-hidden="true"></span>
+      <span>显示地名</span>
+    </label>
+    <div class="legend-title">事件分类</div>` +
+    Object.entries(CATS).map(([k,v])=>
+      `<div class="legend-row"><span class="swatch" style="background:${v.color}"></span>${v.label}</div>`
+    ).join('') + `
+    <div class="legend-title" style="margin-top:12px">年代疆域示意</div>
+    <div class="legend-row"><span class="swatch" style="background:rgba(77,122,82,.45)"></span>势力扩张</div>
+    <div class="legend-row"><span class="swatch" style="background:rgba(156,51,39,.45)"></span>解体 / 割让</div>
+    <div class="legend-row"><span class="swatch" style="background:rgba(168,127,53,.45)"></span>政权存续</div>`;
+  document.getElementById('placeToggle').addEventListener('change', e=>{
+    state.showPlaces = e.target.checked;
+    drawMarkers();
+  });
+}
+
+/* ================= 分期 ================= */
+function periodOf(year){
+  return PERIODS.find(p=>year>=p[0]&&year<=p[1]) || PERIODS[PERIODS.length-1];
+}
+
+/* ================= 搜索 ================= */
+function eventHay(ev){
+  const idx = EVENTS.indexOf(ev);
+  const ex = EXAM[String(idx)] || {};
+  const kp = (KP[String(idx)] || []).join(' ');
+  return (ev.t + ' ' + ev.p + ' ' + ev.d + ' ' + (ev.wiki || '') + ' ' +
+    (ex.people || '') + ' ' + (ex.status || '') + ' ' + (ex.impact || '') + ' ' + kp
+  ).toLowerCase();
+}
+
+function searchEvents(q){
+  const yearM = q.match(/(?:18|19)\d{2}/);
+  const year = yearM ? Number(yearM[0]) : null;
+  const text = q.replace(/(?:18|19)\d{2}/g,'').replace(/[+＋,，、·]/g,' ').trim();
+  const words = text.toLowerCase().split(/\s+/).filter(Boolean);
+  return EVENTS.filter(ev=>{
+    if (year && ev.y!==year) return false;
+    if (!words.length) return true;
+    const hay = eventHay(ev);
+    return words.every(w=>hay.includes(w));
+  }).sort((a,b)=>a.y-b.y || a.t.localeCompare(b.t,'zh'));
+}
+
+function currentEvents(){
+  if (state.query.trim()) return searchEvents(state.query);
+  if (state.year === 'all') return EVENTS.slice().sort((a,b)=>a.y-b.y || a.t.localeCompare(b.t,'zh'));
+  return EVENTS.filter(e=>e.y===state.year);
+}
+
+function nearestEvents(n=5){
+  return EVENTS.slice()
+    .sort((a,b)=>Math.abs(a.y-state.year)-Math.abs(b.y-state.year) || a.y-b.y)
+    .slice(0,n);
+}
+
+/* ================= 下拉菜单 ================= */
+function renderDropdown(){
+  let html = `<button class="dd-opt ${state.year==='all'?'active':''}" data-year="all" role="option" aria-selected="${state.year==='all'}"><span>全部事件</span><span class="dd-count">${EVENTS.length} 起</span></button>`;
+  PERIODS.forEach(p=>{
+    const years = YEARS.filter(y=>y>=p[0]&&y<=p[1]);
+    if (!years.length) return;
+    html += `<div class="dd-group-title">${p[2]}</div>`;
+    years.forEach(y=>{
+      const n = EVENTS.filter(e=>e.y===y).length;
+      html += `<button class="dd-opt ${state.year===y?'active':''}" data-year="${y}" role="option" aria-selected="${state.year===y}"><span>${y} 年</span><span class="dd-count">${n} 起</span></button>`;
+    });
+  });
+  ddPop.innerHTML = html;
+  ddPop.querySelectorAll('.dd-opt').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      setYear(b.dataset.year==='all' ? 'all' : Number(b.dataset.year));
+      closeDD();
+    });
+  });
+}
+
+function openDD(){
+  state.ddOpen = true;
+  ddPop.classList.add('show');
+  ddBtn.setAttribute('aria-expanded','true');
+}
+function closeDD(){
+  state.ddOpen = false;
+  ddPop.classList.remove('show');
+  ddBtn.setAttribute('aria-expanded','false');
+}
+
+function setYear(year){
+  state.year = year;
+  state.selected = null;
+  if (year === 'all'){
+    ddLabel.textContent = '全部事件';
+    eraDesc.innerHTML = `<h2>全部年代</h2><p>纵览 ${YEAR_MIN}—${YEAR_MAX} 年间世界各地收录的变革、冲突与演进。</p>`;
+  } else {
+    const p = periodOf(year);
+    ddLabel.textContent = `${year} 年 · ${p[2]}`;
+    eraDesc.innerHTML = `<h2>${p[2]}</h2><p>${p[3]}</p>`;
+  }
+  renderDropdown();
+  refresh();
+}
+
+/* ================= 地图绘制 ================= */
+function bboxFeature(b){
+  const [x0,y0,x1,y1] = b;
+  const pts = [[x0,y0],[x1,y0],[x1,y1],[x0,y1],[(x0+x1)/2,(y0+y1)/2]];
+  return { type:'FeatureCollection', features: pts.map(c=>({ type:'Feature', geometry:{ type:'Point', coordinates:c } })) };
+}
+
+function resize(){
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  const atlas = ATLAS.find(a=>a.id===state.atlas) || ATLAS[0];
+  const base = atlas.bbox ? bboxFeature(atlas.bbox) : (landGeo || { type:'Sphere' });
+  proj = geoNaturalEarth1().fitExtent([[10,10],[w-10,h-10]], base);
+  path = geoPath(proj);
+  drawLand();
+  drawRealms();
+  drawMarkers();
+  applyTransform();
+}
+
+function setAtlas(id){
+  state.atlas = id;
+  state.k = 1; state.tx = 0; state.ty = 0;
+  resize();
+}
+
+function drawLand(){
+  gGraticule.innerHTML = '';
+  gLand.innerHTML = '';
+  if (!landGeo) {
+    const sp = document.createElementNS('http://www.w3.org/2000/svg','path');
+    sp.setAttribute('class','sphere');
+    sp.setAttribute('d', path({type:'Sphere'}));
+    gGraticule.appendChild(sp);
+    const gr = document.createElementNS('http://www.w3.org/2000/svg','path');
+    gr.setAttribute('class','graticule');
+    gr.setAttribute('d', path(geoGraticule10()));
+    gGraticule.appendChild(gr);
+    return;
+  }
+  const gr = document.createElementNS('http://www.w3.org/2000/svg','path');
+  gr.setAttribute('class','graticule');
+  gr.setAttribute('d', path(geoGraticule10()));
+  gGraticule.appendChild(gr);
+  landGeo.features.forEach(f=>{
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('class','land');
+    p.setAttribute('d', path(f));
+    gLand.appendChild(p);
+  });
+}
+
+function drawRealms(){
+  gRealms.innerHTML = '';
+  if(state.year==='all' || !landGeo) return;
+  const y = state.year;
+  REALMS.filter(r=>y>=r.from && y<=r.to).forEach(r=>{
+    const [x0,y0,x1,y1] = r.bbox;
+    const ring = [[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]];
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('class','realm '+r.kind);
+    p.setAttribute('d', path({type:'Polygon', coordinates:[ring]}));
+    p.setAttribute('data-name', r.name);
+    gRealms.appendChild(p);
+  });
+}
+
+function drawMarkers(){
+  const data = currentEvents();
+  gMarkers.innerHTML = '';
+  const cluster = {};
+  data.forEach(ev=>{
+    const pos = proj([ev.lng, ev.lat]);
+    if (!pos) return;
+    const key = pos[0].toFixed(1)+','+pos[1].toFixed(1);
+    const n = (cluster[key] = (cluster[key]||0)+1);
+    let [x,y] = pos;
+    if (n > 1){
+      const ang = (n-1) * 2.399;            // 黄金角环形散开
+      x += Math.cos(ang) * 9;
+      y += Math.sin(ang) * 9;
+    }
+    const cat = CATS[ev.c];
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','marker' + (state.selected===ev?' active':''));
+    g.setAttribute('transform', `translate(${x},${y})`);
+    g.dataset.idx = EVENTS.indexOf(ev);
+
+    const halo = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    halo.setAttribute('class','halo'); halo.setAttribute('r', 6);
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('class','dot'); dot.setAttribute('r', 3.2);
+    dot.setAttribute('fill', cat.color);
+    g.append(halo, dot);
+
+    if (state.showPlaces && state.selected!==ev){
+      const region = ev.p.includes(' · ') ? ev.p.split(' · ')[0] : ev.p;
+      const pl = document.createElementNS('http://www.w3.org/2000/svg','text');
+      pl.setAttribute('class','place-label');
+      pl.setAttribute('x', 8); pl.setAttribute('y', 3);
+      pl.textContent = region;
+      g.appendChild(pl);
+    }
+
+    if (state.selected===ev){
+      halo.setAttribute('r', 8); dot.setAttribute('r', 4.5);
+      const lb = document.createElementNS('http://www.w3.org/2000/svg','text');
+      lb.setAttribute('class','marker-label');
+      lb.setAttribute('x', 10); lb.setAttribute('y', 4);
+      lb.textContent = `${ev.y} ${ev.t}`;
+      g.appendChild(lb);
+    }
+
+    g.addEventListener('pointerenter', ()=>showTooltip(ev, g));
+    g.addEventListener('pointerleave', hideTooltip);
+    g.addEventListener('click', (e)=>{ e.stopPropagation(); openModal(ev, true); });
+    gMarkers.appendChild(g);
+  });
+}
+
+/* ================= 列表 ================= */
+function renderList(){
+  const searching = state.query.trim().length > 0;
+  const data = currentEvents();
+  listCount.textContent = searching ? `搜索 ${data.length} 起` : `${data.length} 起`;
+  yearCount.textContent = EVENTS.length;
+
+  if (!data.length){
+    const hint = searching
+      ? `未找到与「${esc(state.query.trim())}」相关的事件，可换地区名、事件名或四位年份试试。`
+      : `${state.year} 年暂无收录事件，以下为邻近年份的事件，点击查看详情。`;
+    listEl.innerHTML = `<div class="list-hint">${hint}</div>` +
+      (searching ? '' : nearestEvents(5).map(ev=>itemHtml(ev, true)).join(''));
+  } else {
+    listEl.innerHTML = data.map(ev=>itemHtml(ev, false)).join('');
+  }
+  listEl.querySelectorAll('.event-item').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ev = EVENTS[Number(btn.dataset.idx)];
+      openModal(ev, true);
+    });
+  });
+}
+
+function itemHtml(ev, isNearest){
+  const cat = CATS[ev.c];
+  const nearestTag = isNearest && ev.y!==state.year ? `<span class="ei-cat">邻近 ${ev.y} 年</span>` : '';
+  return `<button class="event-item ${state.selected===ev?'active':''}" data-idx="${EVENTS.indexOf(ev)}">
+    <div class="ei-top"><span class="ei-year">${ev.y}</span><span class="ei-cat" style="color:${cat.color}">${cat.label}</span>${nearestTag}</div>
+    <div class="ei-title">${esc(ev.t)}</div>
+    <div class="ei-place">${esc(ev.p)}</div>
+  </button>`;
+}
+
+function refresh(){
+  renderList();
+  drawRealms();
+  drawMarkers();
+}
+
+/* ================= 弹窗 ================= */
+function openModal(ev, fly){
+  state.selected = ev;
+  refresh();
+  const cat = CATS[ev.c];
+  const idx = EVENTS.indexOf(ev);
+  const media = MEDIA[String(idx)] || null;
+  document.getElementById('mYear').textContent = `${ev.y} 年`;
+  document.getElementById('mTitle').textContent = ev.t;
+  document.getElementById('mPlace').innerHTML = `${esc(ev.p)}<span class="m-cat" style="background:${cat.color}">${cat.label}</span>`;
+  document.getElementById('mDesc').textContent = ev.d;
+  const kp = KP[String(idx)] || [];
+  document.getElementById('mKp').innerHTML = kp.length
+    ? `<div class="kp-title">知识点</div><ul class="kp-list">${kp.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>`
+    : '';
+
+  const ex = EXAM[String(idx)] || null;
+  document.getElementById('mExam').innerHTML = ex ? `
+    <div class="exam-block">
+      <div class="exam-row"><span class="exam-tag">主要人物</span><span class="exam-val">${esc(ex.people)}</span></div>
+      <div class="exam-row"><span class="exam-tag">历史地位</span><span class="exam-val">${esc(ex.status)}</span></div>
+      <div class="exam-row"><span class="exam-tag">历史影响</span><span class="exam-val">${esc(ex.impact)}</span></div>
+    </div>` : '';
+
+  const q = encodeURIComponent(ev.t);
+  const wikiTitle = encodeURIComponent(ev.wiki || ev.t);
+  const videoHref = media
+    ? `https://www.bilibili.com/video/${media.bv}`
+    : `https://search.bilibili.com/all?keyword=${q}%20历史`;
+  document.getElementById('mRefs').innerHTML = `
+    <a href="https://baike.baidu.com/search?word=${q}" target="_blank" rel="noopener"><span class="ref-dot" style="background:#8a7a4d"></span>百度百科词条</a>
+    <a href="https://image.baidu.com/search/index?word=${q}" target="_blank" rel="noopener"><span class="ref-dot" style="background:#3d6e8f"></span>图片参考</a>
+    <a href="${videoHref}" target="_blank" rel="noopener"><span class="ref-dot" style="background:#9c3327"></span>${media?'查看原视频':'相关视频'}</a>
+    <a href="https://zh.wikipedia.org/wiki/${wikiTitle}" target="_blank" rel="noopener"><span class="ref-dot" style="background:#7a5a8c"></span>维基百科(备用)</a>`;
+
+  overlay.classList.add('show');
+  renderMedia(ev, media);
+  if (fly) centerOn(ev);
+}
+
+function closeModal(){
+  overlay.classList.remove('show');
+  state.selected = null;
+  stopModalMedia();
+  refresh();
+}
+
+function stopModalMedia(){
+  const box = document.getElementById('mMedia');
+  if (!box) return;
+  box.querySelectorAll('iframe').forEach(f=>{ f.src = 'about:blank'; });
+  box.innerHTML = '';
+}
+
+function renderMedia(ev, media){
+  const box = document.getElementById('mMedia');
+  if (!media){
+    box.innerHTML = `<div class="media-ph">
+      <svg viewBox="0 0 64 64" width="42" height="42" fill="none" stroke="#8f7d57" stroke-width="2" aria-hidden="true">
+        <rect x="10" y="16" width="44" height="32" rx="3"/>
+        <circle cx="22" cy="27" r="3"/>
+        <path d="M14 44l12-10 8 7 8-6 8 9"/>
+      </svg>
+      <div>该事件暂无内嵌照片与视频<br>可通过下方图片、视频链接查阅相关资料</div>
+    </div>`;
+    return;
+  }
+  box.innerHTML = `
+    <div class="m-photo" id="mPhoto">
+      <img src="${esc(media.pic)}" alt="${esc(media.vt)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.remove()">
+      <button class="m-play" id="mPlay" aria-label="播放相关视频">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+      </button>
+      <a class="media-attr" href="https://www.bilibili.com/video/${media.bv}" target="_blank" rel="noopener">参考图片 · UP主：${esc(media.au)}</a>
+    </div>
+    <div class="m-video" id="mVideo" hidden>
+      <iframe src="https://player.bilibili.com/player.html?bvid=${media.bv}&autoplay=0&danmaku=0&high_quality=1" title="${esc(media.vt)}" loading="lazy" allowfullscreen></iframe>
+    </div>
+    <div class="m-cap">${esc(media.vt)} · ${esc(media.au)}</div>`;
+
+  const play = box.querySelector('#mPlay');
+  const photo = box.querySelector('#mPhoto');
+  const video = box.querySelector('#mVideo');
+  play.addEventListener('click', ()=>{
+    photo.hidden = true;
+    video.hidden = false;
+  });
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+overlay.addEventListener('click', (e)=>{ if (e.target===overlay) closeModal(); });
+
+/* ================= 平移缩放 ================= */
+function applyTransform(){
+  viewport.setAttribute('transform', `translate(${state.tx},${state.ty}) scale(${state.k})`);
+}
+
+function zoomAt(cx, cy, factor){
+  const k2 = Math.min(6, Math.max(1, state.k * factor));
+  if (k2 === state.k) return;
+  const px = (cx - state.tx) / state.k;
+  const py = (cy - state.ty) / state.k;
+  state.tx = cx - px * k2;
+  state.ty = cy - py * k2;
+  state.k = k2;
+  applyTransform();
+}
+
+function centerOn(ev){
+  const pos = proj([ev.lng, ev.lat]);
+  if (!pos) return;
+  const [x,y] = pos;
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  const k2 = Math.max(state.k, 1.8);
+  const tx2 = w/2 - x*k2, ty2 = h/2 - y*k2;
+  if (reducedMotion){
+    state.k=k2; state.tx=tx2; state.ty=ty2; applyTransform(); return;
+  }
+  const from = {k:state.k, tx:state.tx, ty:state.ty};
+  const start = performance.now(), dur = 300;
+  function step(now){
+    const t = Math.min(1, (now-start)/dur);
+    const e = 1 - Math.pow(1-t, 3);
+    state.k  = from.k  + (k2-from.k)*e;
+    state.tx = from.tx + (tx2-from.tx)*e;
+    state.ty = from.ty + (ty2-from.ty)*e;
+    applyTransform();
+    if (t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* 拖拽 */
+let dragging = false, sx=0, sy=0, stx=0, sty=0;
+let downX=0, downY=0, moved=false;
+svg.addEventListener('pointerdown', (e)=>{
+  dragging = true;
+  svg.classList.add('dragging');
+  svg.setPointerCapture(e.pointerId);
+  sx = e.clientX; sy = e.clientY; stx = state.tx; sty = state.ty;
+  downX = e.clientX; downY = e.clientY; moved = false;
+});
+svg.addEventListener('pointermove', (e)=>{
+  if (!dragging) return;
+  if (Math.hypot(e.clientX-downX, e.clientY-downY) > 5) moved = true;
+  state.tx = stx + (e.clientX - sx);
+  state.ty = sty + (e.clientY - sy);
+  applyTransform();
+});
+svg.addEventListener('pointerup', ()=>{ dragging=false; svg.classList.remove('dragging'); });
+svg.addEventListener('pointercancel', ()=>{ dragging=false; svg.classList.remove('dragging'); });
+
+/* 点击陆地空白：命中最近事件弹出 */
+function nearestEvent(lng, lat){
+  const data = currentEvents();
+  let best=null, bd=Infinity;
+  data.forEach(ev=>{
+    const dx=ev.lng-lng, dy=ev.lat-lat, d=dx*dx+dy*dy;
+    if(d<bd){bd=d;best=ev;}
+  });
+  return { ev:best, dist:Math.sqrt(bd) };
+}
+svg.addEventListener('click', (e)=>{
+  if (moved) return;
+  if (e.target.closest('.marker')) return;
+  const r = wrap.getBoundingClientRect();
+  const pt = proj.invert ? proj.invert([e.clientX-r.left, e.clientY-r.top]) : null;
+  if (!pt || !isFinite(pt[0]) || !isFinite(pt[1])) return;
+  const {ev, dist} = nearestEvent(pt[0], pt[1]);
+  if (ev && dist < 13) openModal(ev, true);
+});
+
+/* 滚轮 */
+wrap.addEventListener('wheel', (e)=>{
+  e.preventDefault();
+  const rect = wrap.getBoundingClientRect();
+  zoomAt(e.clientX-rect.left, e.clientY-rect.top, Math.exp(-e.deltaY*0.0012));
+}, { passive:false });
+
+/* 缩放按钮 */
+document.getElementById('zoomIn').addEventListener('click', ()=>{
+  const r = wrap.getBoundingClientRect();
+  zoomAt(r.width/2, r.height/2, 1.35);
+});
+document.getElementById('zoomOut').addEventListener('click', ()=>{
+  const r = wrap.getBoundingClientRect();
+  zoomAt(r.width/2, r.height/2, 1/1.35);
+});
+document.getElementById('zoomReset').addEventListener('click', ()=>{
+  state.k=1; state.tx=0; state.ty=0; applyTransform();
+});
+svg.addEventListener('dblclick', (e)=>{
+  const r = wrap.getBoundingClientRect();
+  zoomAt(e.clientX-r.left, e.clientY-r.top, 1.5);
+});
+
+/* ================= 下拉与搜索事件 ================= */
+ddBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  state.ddOpen ? closeDD() : openDD();
+});
+document.addEventListener('click', (e)=>{
+  if (!dd.contains(e.target)) closeDD();
+});
+searchInput.addEventListener('input', ()=>{
+  state.query = searchInput.value;
+  state.selected = null;
+  searchClear.classList.toggle('show', searchInput.value.length>0);
+  refresh();
+});
+searchClear.addEventListener('click', ()=>{
+  searchInput.value = '';
+  state.query = '';
+  searchClear.classList.remove('show');
+  state.selected = null;
+  refresh();
+  searchInput.focus();
+});
+document.addEventListener('keydown', (e)=>{
+  if (e.key==='Escape'){ finishIntro(); closeDD(); if (overlay.classList.contains('show')) closeModal(); }
+});
+
+/* ================= 提示框 ================= */
+function showTooltip(ev, g){
+  const cat = CATS[ev.c];
+  tooltip.innerHTML = `<div><span class="tt-year">${ev.y}</span>${esc(ev.t)}</div><div style="color:#c9b98f">${esc(ev.p)} · ${cat.label}</div>`;
+  tooltip.hidden = false;
+  const r = wrap.getBoundingClientRect();
+  const gr = g.getBoundingClientRect();
+  let left = gr.left - r.left + 12, top = gr.top - r.top - 10;
+  if (left + 220 > r.width) left = gr.left - r.left - 220;
+  tooltip.style.left = left+'px';
+  tooltip.style.top = top+'px';
+  tooltip.classList.add('show');
+}
+function hideTooltip(){ tooltip.classList.remove('show'); tooltip.hidden = true; }
+
+/* ================= 边界数据加载 ================= */
+async function loadBoundaries(){
+  try {
+    const res = await fetch('https://fastly.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+    if (!res.ok) throw new Error(res.status);
+    const topo = await res.json();
+    landGeo = feature(topo, topo.objects.countries);
+  } catch (err) {
+    mapNote.hidden = false;
+  }
+  resize();
+}
+
+/* ================= 开场动画（15 秒，可跳过） ================= */
+const introEl = document.getElementById('intro');
+const introTimeline = document.getElementById('introTimeline');
+const introSkip = document.getElementById('introSkip');
+let introDone = false;
+const introTimers = [];
+
+PERIODS.forEach((p, i)=>{
+  const chip = document.createElement('span');
+  chip.className = 'intro-chip';
+  chip.textContent = `${p[0]}—${p[1]} ${p[2]}`;
+  introTimeline.appendChild(chip);
+  introTimers.push(setTimeout(()=>chip.classList.add('on'), 2600 + i*1050));
+});
+
+function finishIntro(){
+  if (introDone) return;
+  introDone = true;
+  introTimers.forEach(clearTimeout);
+  if (!introEl) return;
+  introEl.classList.add('out');
+  setTimeout(()=>introEl.remove(), 650);
+}
+
+introSkip.addEventListener('click', finishIntro);
+introEl.addEventListener('click', (e)=>{ if (e.target===introEl) finishIntro(); });
+introTimers.push(setTimeout(finishIntro, 15000));
+if (reducedMotion) finishIntro();
+
+/* ================= 答题模式 ================= */
+const $ = id => document.getElementById(id);
+const mainEl = document.querySelector('main');
+const quizPanel = $('quizPanel');
+const modeMapBtn = $('modeMap'), modeQuizBtn = $('modeQuiz');
+
+const quiz = { questions: [], idx: 0, score: 0, answers: [], locked: false };
+
+/* ================= 主题课件 PPT ================= */
+const themeOverlay = $('themeOverlay');
+const themeStage = $('themeStage'), themePager = $('themePager'), themeBar = $('themeBar');
+const themePrev = $('themePrev'), themeNext = $('themeNext'), themeTag = $('themeTag');
+const themeInput = $('themeInput'), themeGo = $('themeGo');
+const themeHint = document.querySelector('.theme-hint');
+let themeDeck = null, themeIdx = 0;
+const ZOOMS = [1, 1.15, 1.3];
+let themeZoomIdx = 0;
+let themeFs = false;
+
+function setThemeFs(on){
+  themeFs = on;
+  themeOverlay.classList.toggle('fs', on);
+  $('themeFs').textContent = on ? '退出全屏' : '全屏放映';
+  if(on){
+    if(themeOverlay.requestFullscreen) themeOverlay.requestFullscreen().catch(()=>{});
+  } else if(document.fullscreenElement){
+    document.exitFullscreen().catch(()=>{});
+  }
+}
+function toggleThemeFs(){ setThemeFs(!themeFs); }
+document.addEventListener('fullscreenchange', ()=>{
+  if(!document.fullscreenElement && themeFs) setThemeFs(false);
+});
+
+function applyThemeZoom(){
+  const z = ZOOMS[themeZoomIdx];
+  themeStage.style.zoom = z;
+  $('themeZoomVal').textContent = Math.round(z*100) + '%';
+}
+function themeZoom(dir){
+  themeZoomIdx = Math.min(ZOOMS.length-1, Math.max(0, themeZoomIdx + dir));
+  applyThemeZoom();
+}
+function themeNav(dir){
+  if(!themeDeck) return;
+  const total = 1 + themeDeck.slides.length;
+  const next = themeIdx + dir;
+  if(next < 0 || next > total-1) return;
+  themeIdx = next; renderTheme();
+}
+
+function matchTheme(q){
+  q = q.toLowerCase().trim();
+  let best = null, bs = 0;
+  THEMES.forEach(t=>{
+    let s = 0;
+    t.keys.forEach(k=>{ if(q.includes(k.toLowerCase())) s += k.length; });
+    if(s > bs){ bs = s; best = t; }
+  });
+  return bs > 0 ? best : null;
+}
+
+function relatedChips(related){
+  const items = related.map(i=>EVENTS[i]).filter(Boolean);
+  if(!items.length) return '';
+  return `<div class="tp-related">
+    <div class="tr-title">地图关联事件</div>
+    <div class="tp-chips">${items.map(ev=>{
+      const i = EVENTS.indexOf(ev);
+      return `<button class="tp-chip" data-ev="${i}" type="button">${ev.y} · ${esc(ev.t)}</button>`;
+    }).join('')}</div></div>`;
+}
+
+function renderTheme(){
+  const deck = themeDeck;
+  const total = 1 + deck.slides.length;
+  themeTag.textContent = '主题课件 · ' + deck.name;
+  themePager.textContent = `${themeIdx+1} / ${total}`;
+  themeBar.style.width = ((themeIdx+1)/total*100) + '%';
+  themePrev.disabled = themeIdx === 0;
+  themeNext.textContent = themeIdx === total-1 ? '完成' : '下一页';
+  if(themeIdx === 0){
+    const c = deck.cover;
+    themeStage.innerHTML = `
+      <div class="tp-cover">
+        <div class="tp-eyebrow">${esc(deck.name)}</div>
+        <h2>${esc(c.title)}</h2>
+        <div class="tp-sub">${esc(c.sub)}</div>
+        <p class="tp-lead">${esc(c.lead)}</p>
+      </div>`;
+  } else {
+    const s = deck.slides[themeIdx-1];
+    themeStage.innerHTML = `
+      <div class="tp-slide">
+        <h3>${esc(s.h)}</h3>
+        <ul class="tp-points">${s.points.map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
+        <p class="tp-body">${esc(s.body)}</p>
+        ${s.notes?`<p class="tp-notes">补充：${esc(s.notes)}</p>`:''}
+        ${relatedChips(s.related || deck.related)}
+      </div>`;
+  }
+  themeStage.scrollTop = 0;
+  themeStage.querySelectorAll('.tp-chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ev = EVENTS[Number(btn.dataset.ev)];
+      closeTheme();
+      openModal(ev);
+    });
+  });
+}
+
+function openTheme(deck){
+  themeDeck = deck; themeIdx = 0; themeZoomIdx = 0;
+  applyThemeZoom();
+  renderTheme();
+  themeOverlay.hidden = false;
+}
+function closeTheme(){ if(themeFs) setThemeFs(false); themeOverlay.hidden = true; themeDeck = null; }
+
+function runThemeQuery(){
+  const q = themeInput.value.trim();
+  if(!q) return;
+  const deck = matchTheme(q);
+  if(deck){ openTheme(deck); return; }
+  themeHint.textContent = '未找到对应主题课件，可试试：长征、抗战、一战、二战、鸦片战争、独立运动、科技发明、十月革命、新中国。';
+  setTimeout(()=>{ themeHint.textContent = '输入历史主题，自动识别并放映配套学习课件。'; }, 2600);
+}
+
+themeGo.addEventListener('click', runThemeQuery);
+themeInput.addEventListener('keydown', e=>{ if(e.key==='Enter') runThemeQuery(); });
+$('themeClose').addEventListener('click', closeTheme);
+$('themeFs').addEventListener('click', toggleThemeFs);
+themePrev.addEventListener('click', ()=>themeNav(-1));
+themeNext.addEventListener('click', ()=>{
+  if(!themeDeck) return;
+  const total = 1 + themeDeck.slides.length;
+  if(themeIdx < total-1) themeNav(1);
+  else closeTheme();
+});
+$('themeZoomOut').addEventListener('click', ()=>themeZoom(-1));
+$('themeZoomIn').addEventListener('click', ()=>themeZoom(1));
+themeOverlay.addEventListener('click', e=>{ if(e.target===themeOverlay) closeTheme(); });
+document.addEventListener('keydown', e=>{
+  if(themeOverlay.hidden) return;
+  if(e.key==='Escape') closeTheme();
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); themeNav(-1); }
+  else if(e.key==='ArrowRight'){ e.preventDefault(); themeNav(1); }
+});
+
+function regionOf(ev){ return ev.p.includes(' · ') ? ev.p.split(' · ')[0] : ev.p; }
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+function filterPool(){
+  const region=$('quizRegion').value, cat=$('quizCat').value, era=$('quizEra').value;
+  return EVENTS.map((ev,i)=>({ev,i})).filter(({ev})=>{
+    if(region==='china' && !ev.p.startsWith('中国')) return false;
+    if(region==='world' && ev.p.startsWith('中国')) return false;
+    if(cat!=='all' && ev.c!==cat) return false;
+    if(era!=='all'){
+      const pi=PERIODS.findIndex(x=>ev.y>=x[0]&&ev.y<=x[1]);
+      if(pi!==Number(era)) return false;
+    }
+    return true;
+  }).map(x=>x.i);
+}
+
+function examOf(i){ return EXAM[String(i)] || {}; }
+function primaryPeople(people){
+  if(!people) return '';
+  return people.split(/[；;]/)[0].trim();
+}
+
+/* 题型：考点辨析优先，兼顾基础记忆 */
+const QUIZ_TYPES = ['people','status','impact','kp','region','cat','year'];
+
+function makeQuestion(i, type){
+  const ev = EVENTS[i], ex = examOf(i), kp = KP[String(i)] || [];
+  switch(type){
+    case 'people': {
+      const p = primaryPeople(ex.people); if(!p) return null;
+      return { type, stem:`下列哪位人物与「${ev.t}」直接相关？`, correct:p,
+        distKey:e=>primaryPeople(examOf(EVENTS.indexOf(e)).people) };
+    }
+    case 'status': {
+      if(!ex.status) return null;
+      return { type, stem:`「${ev.t}」的历史地位，下列表述正确的是？`, correct:ex.status,
+        distKey:e=>examOf(EVENTS.indexOf(e)).status };
+    }
+    case 'impact': {
+      if(!ex.impact) return null;
+      return { type, stem:`「${ev.t}」带来的主要历史影响是？`, correct:ex.impact,
+        distKey:e=>examOf(EVENTS.indexOf(e)).impact };
+    }
+    case 'kp': {
+      if(!kp.length) return null;
+      return { type, stem:`关于「${ev.t}」，下列哪一说法正确？`, correct:kp[0],
+        distKey:e=>(KP[String(EVENTS.indexOf(e))]||[''])[0] };
+    }
+    case 'region':
+      return { type, stem:`「${ev.t}」发生在哪个国家 / 地区？`, correct:regionOf(ev),
+        distKey:e=>regionOf(e) };
+    case 'cat':
+      return { type, stem:`「${ev.t}」属于下列哪一类别？`, correct:CATS[ev.c].label,
+        distKey:e=>CATS[e.c].label };
+    case 'year':
+      return { type, stem:`「${ev.t}」发生于哪一年？`, correct:String(ev.y),
+        distKey:e=>String(e.y) };
+  }
+  return null;
+}
+
+function availableTypes(i){
+  return QUIZ_TYPES.filter(t=>makeQuestion(i,t));
+}
+
+function buildQuestions(count){
+  const pool = filterPool();
+  const idxs = shuffle(pool).slice(0, Math.min(count, pool.length));
+  const othersAll = EVENTS.map((_,k)=>k);
+  // 题型洗牌后循环分配，避免同类题连续出现
+  const typeRot = shuffle([...QUIZ_TYPES]);
+  const qs = [];
+  idxs.forEach((i, n)=>{
+    const ev = EVENTS[i];
+    const avail = availableTypes(i);
+    let t = typeRot[n % typeRot.length];
+    if(!avail.includes(t)) t = avail[Math.floor(Math.random()*avail.length)];
+    let picked = makeQuestion(i,t) || makeQuestion(avail[0]);
+    if(!picked) return;
+
+    const seen = new Set([picked.correct]);
+    const dist = [];
+    for(const k of shuffle(othersAll.filter(k=>k!==i))){
+      const v = picked.distKey(EVENTS[k]);
+      if(!v || seen.has(v)) continue;
+      seen.add(v); dist.push(v);
+      if(dist.length===3) break;
+    }
+    // 干扰项不足时回退同字段补充（年份/地区等兜底）
+    if(dist.length<3){
+      const fb = picked.type==='year' ? e=>String(e.y) : picked.type==='region' ? e=>regionOf(e) : picked.distKey;
+      for(const k of shuffle(othersAll.filter(k=>k!==i))){
+        const v = fb(EVENTS[k]);
+        if(!v || seen.has(v)) continue;
+        seen.add(v); dist.push(v);
+        if(dist.length===3) break;
+      }
+    }
+    const options = shuffle([{text:picked.correct,correct:true}, ...dist.map(t=>({text:t,correct:false}))]);
+    qs.push({ i, ev, type:picked.type, stem:picked.stem, options,
+      explain: KP[String(i)] || [], desc: ev.d, exam: examOf(i) });
+  });
+  return qs;
+}
+
+function showPanel(name){ ['quizStart','quizPlay','quizResult'].forEach(p=>$(p).hidden = p!==name); }
+
+function beginQuiz(){
+  const n = parseInt($('quizCount').value, 10);
+  const pool = filterPool();
+  if(!pool.length){
+    alert('当前所选范围内暂无收录事件，请调整地区、分类或年代范围。');
+    return;
+  }
+  quiz.questions = buildQuestions(n);
+  quiz.idx = 0; quiz.score = 0; quiz.answers = [];
+  clearQa();
+  showPanel('quizPlay');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  quiz.locked = false;
+  const q = quiz.questions[quiz.idx];
+  $('quizProgress').textContent = `第 ${quiz.idx+1} / ${quiz.questions.length} 题`;
+  $('quizScore').textContent = `得分 ${quiz.score}`;
+  $('quizStem').textContent = q.stem;
+  $('quizExplain').hidden = true;
+  $('quizNext').hidden = true;
+  const keys = ['A','B','C','D'];
+  $('quizOptions').innerHTML = q.options.map((o,k)=>`
+    <button class="quiz-option" data-k="${k}">
+      <span class="qo-key">${keys[k]}</span><span>${esc(o.text)}</span>
+    </button>`).join('');
+  [...$('quizOptions').children].forEach(btn=>{
+    btn.addEventListener('click', ()=>answerQuestion(Number(btn.dataset.k), btn));
+  });
+}
+
+function answerQuestion(k, btn){
+  if(quiz.locked) return;
+  quiz.locked = true;
+  const q = quiz.questions[quiz.idx];
+  const picked = q.options[k];
+  const isRight = picked.correct;
+  if(isRight) quiz.score++;
+  quiz.answers.push({ q, picked: picked.text, isRight });
+  [...$('quizOptions').children].forEach((b,bi)=>{
+    b.classList.add('locked');
+    if(q.options[bi].correct) b.classList.add('correct');
+  });
+  if(!isRight) btn.classList.add('wrong');
+  $('quizScore').textContent = `得分 ${quiz.score}`;
+  const kpHtml = q.explain.map(b=>`<li>${esc(b)}</li>`).join('');
+  const ex = q.exam || {};
+  const examRows = [
+    ex.people ? ['主要人物', primaryPeople(ex.people)] : null,
+    ex.status ? ['历史地位', ex.status] : null,
+    ex.impact ? ['历史影响', ex.impact] : null
+  ].filter(Boolean);
+  const examHtml = examRows.map(([tag,val])=>`
+    <div class="exam-row"><span class="exam-tag">${tag}</span><span class="exam-val">${esc(val)}</span></div>`).join('');
+  $('quizExplain').innerHTML = `
+    <div class="qe-title">${isRight?'回答正确':'回答错误'}</div>
+    <div>${esc(q.desc)}</div>
+    ${examHtml?`<div class="exam-block" style="margin-top:8px">${examHtml}</div>`:''}
+    ${kpHtml?`<ul class="kp-list" style="margin-top:6px">${kpHtml}</ul>`:''}`;
+  $('quizExplain').hidden = false;
+  $('quizNext').hidden = false;
+  $('quizNext').textContent = quiz.idx===quiz.questions.length-1 ? '查看结果' : '下一题';
+}
+
+function nextQuestion(){
+  if(quiz.idx < quiz.questions.length-1){ quiz.idx++; renderQuestion(); }
+  else renderResult();
+}
+
+function renderResult(){
+  showPanel('quizResult');
+  const total = quiz.questions.length, right = quiz.score;
+  const rate = Math.round(right/total*100);
+  const wrong = quiz.answers.filter(a=>!a.isRight);
+  $('resultTitle').textContent = rate>=80 ? '成绩优秀' : rate>=60 ? '继续加油' : '仍需巩固';
+  $('resultStat').innerHTML = `
+    <div class="rs-item"><span class="rs-num">${right}/${total}</span><span class="rs-label">答对题数</span></div>
+    <div class="rs-item"><span class="rs-num">${rate}%</span><span class="rs-label">正确率</span></div>
+    <div class="rs-item"><span class="rs-num">${wrong.length}</span><span class="rs-label">待巩固错题</span></div>`;
+  $('resultReview').innerHTML = quiz.answers.map((a,ai)=>{
+    const ex = EXAM[String(a.q.i)] || {};
+    const examLine = ex.people ? `<div class="ri-line">考点：${esc(ex.people)}｜${esc(ex.status||'')}｜${esc(ex.impact||'')}</div>` : '';
+    return `
+    <div class="review-item ${a.isRight?'':'bad-item'}">
+      <div class="ri-stem">${ai+1}. ${esc(a.q.stem)}</div>
+      <div class="ri-line ${a.isRight?'ok':'bad'}">${a.isRight?'✓ 回答正确':'✗ 你的选择：'+esc(a.picked)}</div>
+      <div class="ri-line">正确答案：${esc(a.q.options.find(o=>o.correct).text)}</div>
+      ${examLine}
+    </div>`;
+  }).join('');
+  $('quizReviewDeck').hidden = wrong.length===0;
+}
+
+function buildReviewDeck(){
+  const wrong = quiz.answers.filter(a=>!a.isRight);
+  const total = quiz.questions.length, right = quiz.score;
+  const rate = Math.round(right/total*100);
+  const slides = wrong.map((a, n)=>{
+    const i = a.q.i, ev = a.q.ev;
+    const ex = EXAM[String(i)] || {};
+    const correct = a.q.options.find(o=>o.correct).text;
+    const points = [
+      '题目：' + a.q.stem,
+      '你的选择：' + a.picked,
+      '正确答案：' + correct
+    ];
+    const notes = [
+      ex.people ? '主要人物：' + ex.people : '',
+      ex.status ? '历史地位：' + ex.status : '',
+      ex.impact ? '历史影响：' + ex.impact : ''
+    ].filter(Boolean).join('；');
+    const kp = (a.q.explain || []).map(b=>'知识点：' + b);
+    return { h:`错题 ${n+1} · ${ev.t}`, points, body: a.q.desc, notes: notes || kp.join('；'), related:[i] };
+  });
+  return {
+    name:'错题复盘',
+    cover:{ title:'错题复盘 · 知识点归集', sub:`共 ${wrong.length} 道待巩固题目`, lead:`本轮共 ${total} 题，答对 ${right} 题，正确率 ${rate}%。下列课件逐题归集错题考点，可用左右方向键翻页复习，点击关联事件可回到地图查看详情。` },
+    slides,
+    related:[]
+  };
+}
+
+function openReviewDeck(){
+  const deck = buildReviewDeck();
+  if(!deck.slides.length) return;
+  openTheme(deck);
+}
+
+function switchMode(mode){
+  state.mode = mode;
+  const map = mode==='map';
+  mainEl.hidden = !map;
+  quizPanel.hidden = map;
+  modeMapBtn.classList.toggle('active', map);
+  modeQuizBtn.classList.toggle('active', !map);
+  modeMapBtn.setAttribute('aria-selected', String(map));
+  modeQuizBtn.setAttribute('aria-selected', String(!map));
+  if(map){ closeModal(); }
+  else {
+    closeModal();
+    showPanel('quizStart');
+    if(!$('qaLog').children.length) addQa('sys','我是史鉴，可就当前题目连续追问。');
+  }
+}
+
+/* ================= 答疑助手（外部 API + 本地兜底） ================= */
+let aiCfg = null;
+try { aiCfg = JSON.parse(localStorage.getItem('aiCfg') || 'null'); } catch(e){ aiCfg = null; }
+
+const PROVIDERS = {
+  doubao: {
+    base: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+    basePh: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+    modelPh: '接入点 ID 或模型名，如 ep-2024xxxxxx / doubao-seed-...',
+    hint: '豆包（火山方舟）：在方舟控制台创建「推理接入点」，将接入点 ID 填入模型；API Key 在控制台「API Key 管理」中获取。'
+  },
+  openai: {
+    base: '',
+    basePh: 'https://api.example.com/v1/chat/completions',
+    modelPh: '例如 gpt-4o-mini',
+    hint: '其他 OpenAI 兼容服务：填写兼容 Chat Completions 的接口地址、模型名与密钥即可。'
+  }
+};
+const PRESET_BASES = Object.values(PROVIDERS).map(p=>p.base).filter(Boolean);
+
+function applyProvider(id, fillBase){
+  const p = PROVIDERS[id]; if(!p) return;
+  $('aiBase').placeholder = p.basePh;
+  $('aiModel').placeholder = p.modelPh;
+  $('aiProviderHint').textContent = p.hint;
+  if(fillBase && (!$('aiBase').value || PRESET_BASES.includes($('aiBase').value.trim()))){
+    $('aiBase').value = p.base;
+  }
+}
+
+function formatEvent(ev, i){
+  const kp = KP[String(i)] || [];
+  return `【${ev.y} · ${ev.t}（${regionOf(ev)}）】\n${ev.d}\n` + kp.map(b=>'· '+b).join('\n');
+}
+
+function localAnswer(query, contextEv){
+  const q = query.toLowerCase().trim();
+  const core = q.replace(/[它他这个那有什么历史影响意义原因背景经过时间哪吗呢啊的了和与是在]/g,'');
+  const anaphoric = core.length < 2;
+  if(anaphoric && contextEv){
+    return { text: formatEvent(contextEv, EVENTS.indexOf(contextEv)), ev: contextEv };
+  }
+  const grams = [];
+  for(let i=0;i<q.length-1;i++){ const g=q.slice(i,i+2); if(/[一-龥a-z0-9]/.test(g)) grams.push(g); }
+  let best = null, bestScore = 0;
+  EVENTS.forEach((ev,i)=>{
+    const blob = (ev.t+' '+ev.p+' '+ev.d+' '+(KP[String(i)]||[]).join(' ')).toLowerCase();
+    let s = 0;
+    grams.forEach(g=>{ if(blob.includes(g)) s += 1; });
+    if(ev.t.toLowerCase().includes(q)) s += 5;
+    if(contextEv && ev===contextEv) s += 3;
+    if(s > bestScore){ bestScore = s; best = {ev,i}; }
+  });
+  if(!best || bestScore===0) return { text:'暂未在内置近代史资料中找到相关条目，可换用事件名、年份或国家名提问。', ev:contextEv || null };
+  const {ev,i} = best;
+  return { text: formatEvent(ev,i), ev };
+}
+
+async function aiAnswer(query, context, history){
+  if(!aiCfg || !aiCfg.base || !aiCfg.key) return null;
+  const sys = '你是「史鉴」，世界近代史题库答疑助手。请结合给定的事件资料与此前对话作答：讲清事件背景、经过、因果与历史影响，必要时与其他事件做比较联系；回答简洁准确、条理清楚，资料未提及的内容不要编造，不知道就如实说明。';
+  const ctxMsg = context ? {role:'system', content:'当前题目相关资料：\n'+context} : null;
+  const recent = (history || []).slice(-10);
+  const messages = [
+    {role:'system', content:sys},
+    ...(ctxMsg ? [ctxMsg] : []),
+    ...recent,
+    {role:'user', content:query}
+  ];
+  const resp = await fetch(aiCfg.base, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiCfg.key},
+    body: JSON.stringify({
+      model: aiCfg.model || '',
+      messages
+    })
+  });
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  const data = await resp.json();
+  return data.choices?.[0]?.message?.content || null;
+}
+
+function addQa(role, text){
+  const div = document.createElement('div');
+  div.className = 'qa-msg '+role;
+  div.textContent = text;
+  $('qaLog').appendChild(div);
+  $('qaLog').scrollTop = $('qaLog').scrollHeight;
+}
+function clearQa(){ qaHistory.length = 0; lastLocalEv = null; $('qaLog').innerHTML=''; addQa('sys','我是史鉴，可就当前题目连续追问。'); }
+
+const qaHistory = [];
+let lastLocalEv = null;
+
+function currentContext(){
+  if(quiz.questions.length && quiz.idx < quiz.questions.length){
+    const q = quiz.questions[quiz.idx];
+    const kp = (KP[String(q.i)] || []).map(b=>'· '+b).join('\n');
+    return `${q.ev.t}（${q.ev.y}，${regionOf(q.ev)}）：${q.desc}\n${kp}`;
+  }
+  return '';
+}
+function currentEvent(){
+  if(quiz.questions.length && quiz.idx < quiz.questions.length) return quiz.questions[quiz.idx].ev;
+  return null;
+}
+
+async function sendQa(){
+  const input = $('qaInput');
+  const q = input.value.trim();
+  if(!q) return;
+  addQa('user', q);
+  input.value = '';
+  addQa('bot','思考中…');
+  const bot = $('qaLog').lastElementChild;
+  let reply = null, fallback = false;
+  const ctxEv = lastLocalEv || currentEvent();
+  try{
+    reply = await aiAnswer(q, currentContext(), qaHistory);
+    if(!reply){
+      const res = localAnswer(q, ctxEv);
+      reply = res.text; lastLocalEv = res.ev || lastLocalEv;
+      fallback = true;
+    } else {
+      lastLocalEv = ctxEv;
+    }
+  }catch(e){
+    const res = localAnswer(q, ctxEv);
+    reply = 'AI 接口调用失败，已切换本地知识库：\n' + res.text;
+    lastLocalEv = res.ev || lastLocalEv;
+    fallback = true;
+  }
+  bot.textContent = reply;
+  if(fallback) bot.classList.add('sys');
+  if(!fallback){
+    qaHistory.push({role:'user', content:q});
+    qaHistory.push({role:'assistant', content:reply});
+  }
+}
+
+function openAi(){
+  const prov = aiCfg?.provider || 'doubao';
+  $('aiProvider').value = prov;
+  $('aiBase').value = aiCfg?.base || '';
+  $('aiModel').value = aiCfg?.model || '';
+  $('aiKey').value = aiCfg?.key || '';
+  applyProvider(prov, false);
+  $('aiSettings').hidden = false;
+}
+function closeAi(){ $('aiSettings').hidden = true; }
+
+modeMapBtn.addEventListener('click', ()=>switchMode('map'));
+modeQuizBtn.addEventListener('click', ()=>switchMode('quiz'));
+$('quizBegin').addEventListener('click', beginQuiz);
+$('quizNext').addEventListener('click', nextQuestion);
+$('quizQuit').addEventListener('click', ()=>switchMode('map'));
+$('quizRetry').addEventListener('click', beginQuiz);
+$('quizReviewDeck').addEventListener('click', openReviewDeck);
+$('quizBackMap').addEventListener('click', ()=>switchMode('map'));
+$('quizAiSettings').addEventListener('click', openAi);
+$('qaSettings').addEventListener('click', openAi);
+$('qaClear').addEventListener('click', clearQa);
+$('aiClose').addEventListener('click', closeAi);
+$('aiProvider').addEventListener('change', e=>applyProvider(e.target.value, true));
+$('aiSave').addEventListener('click', ()=>{
+  aiCfg = { provider:$('aiProvider').value, base:$('aiBase').value.trim(), model:$('aiModel').value.trim(), key:$('aiKey').value.trim() };
+  localStorage.setItem('aiCfg', JSON.stringify(aiCfg));
+  closeAi(); addQa('sys','AI 配置已保存。');
+});
+$('aiClear').addEventListener('click', ()=>{
+  aiCfg = null; localStorage.removeItem('aiCfg');
+  $('aiProvider').value = 'doubao'; applyProvider('doubao', false);
+  $('aiBase').value=''; $('aiModel').value=''; $('aiKey').value='';
+});
+$('qaSend').addEventListener('click', sendQa);
+$('qaInput').addEventListener('keydown', e=>{ if(e.key==='Enter') sendQa(); });
+
+/* ================= 启动 ================= */
+const atlasSelect = document.getElementById('atlasSelect');
+atlasSelect.innerHTML = ATLAS.map(a=>`<option value="${a.id}">地图册 · ${a.name}</option>`).join('');
+atlasSelect.addEventListener('change', ()=>setAtlas(atlasSelect.value));
+$('quizEra').innerHTML = '<option value="all">全部年代</option>' + PERIODS.map((p,i)=>`<option value="${i}">${p[0]}—${p[1]} · ${p[2]}</option>`).join('');
+rangeMeta.textContent = `收录 ${YEAR_MIN}—${YEAR_MAX} · ${EVENTS.length} 起`;
+renderLegend();
+setYear(1840);
+loadBoundaries();
+window.addEventListener('resize', resize);
+</script>
+</body>
+</html>
