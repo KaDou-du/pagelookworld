@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>图见world · 1804–2000</title>
+<link rel="icon" href="assets/favicon.svg">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<!-- 开场动画（15 秒，可跳过） -->
+<div id="intro" aria-hidden="true">
+  <button class="intro-skip" id="introSkip">跳过 <span>›</span></button>
+  <div class="intro-inner">
+    <div class="intro-eyebrow">INTERACTIVE HISTORY ATLAS</div>
+    <h1 class="intro-title">图见world</h1>
+    <div class="intro-sub">1804 — 2000 · 近九十起事件串联近两个世纪的变革、冲突与演进</div>
+    <div class="intro-timeline" id="introTimeline"></div>
+  </div>
+  <div class="intro-progress"><span id="introBar"></span></div>
+</div>
+
+<header>
+  <div class="title-block">
+    <h1>图见world <span class="year">1804–2000</span></h1>
+    <p>拖动平移、滚轮缩放；下拉选择年份，或在右侧按地区与年份检索事件</p>
+  </div>
+  <div class="mode-switch" role="tablist" aria-label="模式切换">
+    <button id="modeMap" class="mode-btn active" role="tab" aria-selected="true">地图浏览</button>
+    <button id="modeReview" class="mode-btn" role="tab" aria-selected="false">考前复习</button>
+    <button id="modeQuiz" class="mode-btn" role="tab" aria-selected="false">答题模式</button>
+  </div>
+  <div class="era-count">共收录 <strong id="yearCount">0</strong> 起事件</div>
+</header>
+
+<main>
+  <section id="mapPanel">
+    <div class="control-bar">
+      <div class="dd" id="dd">
+        <button class="dd-btn" id="ddBtn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="dd-year" id="ddLabel">1840 年</span>
+          <span class="dd-caret">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+          </span>
+        </button>
+        <div class="dd-pop" id="ddPop" role="listbox"></div>
+      </div>
+      <select id="atlasSelect" class="atlas-select" aria-label="选择地图册"></select>
+      <span class="control-meta" id="rangeMeta"></span>
+    </div>
+    <div id="mapWrap">
+      <svg id="map" role="img" aria-label="图见world 历史地图">
+        <g id="viewport">
+          <g id="graticule"></g>
+          <g id="land"></g>
+          <g id="realms"></g>
+          <g id="markers"></g>
+        </g>
+      </svg>
+      <div id="zoomControls">
+        <button id="zoomIn" aria-label="放大">＋</button>
+        <button id="zoomOut" aria-label="缩小">－</button>
+        <button id="zoomReset" aria-label="重置视角">⌂</button>
+      </div>
+      <div id="legend"></div>
+      <div id="tooltip" hidden></div>
+      <div id="mapNote" hidden>边界数据离线未加载，当前仅显示事件点位与经纬网格</div>
+    </div>
+  </section>
+
+  <aside id="sidePanel">
+    <div class="search-box">
+      <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+      <input type="search" id="searchInput" placeholder="搜索地区或事件，如：中国 1949" autocomplete="off">
+      <button class="search-clear" id="searchClear" aria-label="清空搜索">✕</button>
+    </div>
+    <div class="theme-box">
+      <input type="search" id="themeInput" placeholder="输入主题生成课件，如：长征" autocomplete="off">
+      <button id="themeGo" type="button">生成课件</button>
+    </div>
+    <p class="theme-hint">输入历史主题，自动识别并放映配套学习课件。</p>
+    <div id="eraDesc"></div>
+    <div class="list-head"><span>事件列表</span><span id="listCount"></span></div>
+    <div id="eventList"></div>
+  </aside>
+</main>
+
+<!-- 答题模式 -->
+<section id="quizPanel" hidden>
+  <div class="quiz-wrap">
+    <div class="quiz-main">
+      <div id="quizStart" class="quiz-card">
+        <div class="quiz-eyebrow">QUIZ MODE</div>
+        <h2>近代史知识答题</h2>
+        <p class="quiz-intro">从收录的 1804—2000 年事件中随机抽取题目，涵盖年份、地点、分类与知识点判断。作答后即时判分并给出解析，可随时向史鉴提问。</p>
+        <div class="quiz-opts">
+          <label>题目数量
+            <select id="quizCount">
+              <option value="10">10 题</option>
+              <option value="20" selected>20 题</option>
+              <option value="68">全部 68 题</option>
+            </select>
+          </label>
+          <label>地区范围
+            <select id="quizRegion">
+              <option value="all" selected>全部地区</option>
+              <option value="china">中国近代史</option>
+              <option value="world">世界史</option>
+            </select>
+          </label>
+          <label>事件分类
+            <select id="quizCat">
+              <option value="all" selected>全部分类</option>
+              <option value="war">战争冲突</option>
+              <option value="revolution">革命起义</option>
+              <option value="diplomacy">条约外交</option>
+              <option value="independence">独立运动</option>
+              <option value="tech">科技发明</option>
+              <option value="society">社会思潮</option>
+            </select>
+          </label>
+          <label>年代范围
+            <select id="quizEra">
+              <option value="all" selected>全部年代</option>
+            </select>
+          </label>
+        </div>
+        <div class="quiz-actions">
+          <button id="quizBegin" class="btn-primary">开始答题</button>
+          <button id="quizAiSettings" class="btn-ghost">AI 答疑设置</button>
+        </div>
+      </div>
+
+      <div id="quizPlay" class="quiz-card" hidden>
+        <div class="quiz-top">
+          <span id="quizProgress" class="quiz-progress"></span>
+          <span id="quizScore" class="quiz-score"></span>
+          <button id="quizQuit" class="btn-ghost btn-sm">退出答题</button>
+        </div>
+        <div id="quizStem" class="quiz-stem"></div>
+        <div id="quizOptions" class="quiz-options"></div>
+        <div id="quizExplain" class="quiz-explain" hidden></div>
+        <div class="quiz-bottom">
+          <button id="quizNext" class="btn-primary" hidden>下一题</button>
+        </div>
+      </div>
+
+      <div id="quizResult" class="quiz-card" hidden>
+        <div class="quiz-eyebrow">RESULT</div>
+        <h2 id="resultTitle">答题完成</h2>
+        <div id="resultStat" class="result-stat"></div>
+        <div id="resultReview" class="result-review"></div>
+        <div class="quiz-actions">
+          <button id="quizReviewDeck" class="btn-primary" hidden>生成错题总结课件</button>
+          <button id="quizRetry" class="btn-primary">再答一轮</button>
+          <button id="quizBackMap" class="btn-ghost">返回地图</button>
+        </div>
+      </div>
+    </div>
+
+    <aside id="quizAssistant">
+      <div class="qa-head">
+        <span class="qa-name">史鉴 <em>答疑助手</em></span>
+        <div class="qa-actions">
+          <button id="qaClear" class="qa-cfg" type="button">清空对话</button>
+          <button id="qaSettings" class="qa-cfg" type="button">设置</button>
+        </div>
+      </div>
+      <div id="qaLog" class="qa-log"></div>
+      <div class="qa-input">
+        <input id="qaInput" type="text" placeholder="可连续追问，如：这一事件有什么影响？和前一问有何关联？" autocomplete="off">
+        <button id="qaSend" aria-label="发送提问">发送</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- 考前复习模式 -->
+<section id="reviewPanel" hidden>
+  <div class="review-wrap">
+    <div class="review-toolbar">
+      <div class="search-box review-search">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+        <input id="reviewSearch" type="search" placeholder="搜索事件、人物、地区或年份，如：长征 / 中国 1978" autocomplete="off">
+      </div>
+      <select id="reviewCat" aria-label="按分类筛选">
+        <option value="all">全部分类</option>
+        <option value="war">战争冲突</option>
+        <option value="revolution">革命起义</option>
+        <option value="diplomacy">条约外交</option>
+        <option value="independence">独立运动</option>
+        <option value="tech">科技发明</option>
+        <option value="society">社会思潮</option>
+      </select>
+      <select id="reviewEra" aria-label="按年代筛选">
+        <option value="all">全部年代</option>
+      </select>
+      <span id="reviewCount" class="control-meta"></span>
+    </div>
+    <div id="reviewList" class="review-list"></div>
+  </div>
+</section>
+
+<!-- AI 配置抽屉 -->
+<div id="aiSettings" hidden>
+  <div class="ai-card" role="dialog" aria-modal="true" aria-label="AI 答疑配置">
+    <div class="ai-head">
+      <h3>AI 答疑配置</h3>
+      <button id="aiClose" class="btn-ghost btn-sm" aria-label="关闭">✕</button>
+    </div>
+    <p class="ai-sub">默认接入豆包大模型（火山方舟）：填入 API Key 即可对话，模型与接口地址可留空使用默认值；未配置或调用失败时，自动回退到本机内置知识库答疑。</p>
+    <form id="aiForm" onsubmit="return false">
+    <label class="ai-field">服务商
+      <select id="aiProvider">
+        <option value="doubao">豆包 · 火山方舟</option>
+        <option value="openai">其他 OpenAI 兼容服务</option>
+      </select>
+    </label>
+    <label class="ai-field">接口地址
+      <input id="aiBase" type="text" placeholder="https://ark.cn-beijing.volces.com/api/v3/chat/completions" autocomplete="off">
+    </label>
+    <label class="ai-field">模型名称 / 接入点 ID
+      <input id="aiModel" type="text" placeholder="接入点 ID 或模型名，如 ep-2024xxxxxx / doubao-seed-..." autocomplete="off">
+    </label>
+    <label class="ai-field">API Key
+      <input id="aiKey" type="password" placeholder="方舟控制台获取的 API Key" autocomplete="off">
+    </label>
+    <p class="ai-sub" id="aiProviderHint"></p>
+    <p class="ai-warn">密钥仅保存在本机浏览器 localStorage；浏览器端直连存在泄露风险，请勿在公共设备填写。</p>
+    </form>
+    <div class="ai-actions">
+      <button id="aiSave" type="button" class="btn-primary">保存配置</button>
+      <button id="aiClear" type="button" class="btn-ghost">清除配置</button>
+    </div>
+  </div>
+</div>
+
+<!-- 事件详情弹窗 -->
+<div id="modalOverlay" role="dialog" aria-modal="true" aria-label="事件详情">
+  <div id="modalCard">
+    <div class="modal-head">
+      <div class="m-year" id="mYear"></div>
+      <button class="modal-close" id="modalClose" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="m-media" id="mMedia"></div>
+      <h3 id="mTitle"></h3>
+      <div class="modal-place" id="mPlace"></div>
+      <p class="modal-desc" id="mDesc"></p>
+      <div class="m-exam" id="mExam"></div>
+      <div class="m-kp" id="mKp"></div>
+      <div class="modal-refs" id="mRefs"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 主题课件 PPT -->
+<div id="themeOverlay" hidden role="dialog" aria-modal="true" aria-label="主题课件放映">
+  <div id="themeCard">
+    <div class="theme-top">
+      <span class="theme-tag" id="themeTag">主题课件</span>
+      <div class="theme-zoom">
+        <button id="themeZoomOut" type="button" aria-label="缩小课件">A−</button>
+        <span id="themeZoomVal">100%</span>
+        <button id="themeZoomIn" type="button" aria-label="放大课件">A+</button>
+      </div>
+      <button id="themeFs" type="button" class="theme-fs" aria-label="全屏放映">全屏放映</button>
+      <button class="theme-close" id="themeClose" aria-label="关闭课件">✕</button>
+    </div>
+    <div class="theme-stage" id="themeStage"></div>
+    <div class="theme-bottom">
+      <span class="theme-pager" id="themePager"></span>
+      <div class="theme-progress"><span id="themeBar"></span></div>
+      <div class="theme-nav">
+        <button id="themePrev" type="button">上一页</button>
+        <button id="themeNext" type="button" class="primary">下一页</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>事件为教材级近代史梳理，地名标注至国家 / 地域；地图边界来自 Natural Earth（world-atlas 110m）；疆域色块为教材示意，非精确历史边界；弹窗内视频与封面来自 B 站相关历史投稿，未收录素材的事件提供百科、图片与视频搜索入口。</span>
+  <span>范围：世界近现代史 · 1804 — 2000</span>
+</footer>
+
+<script src="https://fastly.jsdelivr.net/npm/d3@7"></script>
+<script src="https://fastly.jsdelivr.net/npm/topojson-client@3"></script>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
